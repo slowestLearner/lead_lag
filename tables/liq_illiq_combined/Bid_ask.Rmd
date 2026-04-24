@@ -1,0 +1,279 @@
+---
+author: ""
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{float}
+   - \usepackage{natbib}
+geometry: "left=2cm,right=2cm,top=2.9cm,bottom=1.2cm"
+output: 
+  pdf_document:
+    keep_tex: true
+    number_sections: true
+# bibliography: crossmom.bib
+link-citations: yes
+
+---
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(rio)
+library(latex2exp)
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(lubridate)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(haven)
+library(tidyr)
+library(tidyverse)
+library(stargazer, quietly = TRUE)
+library(plm) 
+library(xtable)
+library(RColorBrewer)
+library(ggrepel)
+library(ggpmisc)
+library(scales)
+library(sandwich)
+library(lmtest)
+library(data.table)
+library(gtools)
+library(sjlabelled)
+library(pracma)
+library(fs)
+library(reshape)
+library(reshape2)
+library(parallel)
+library(this.path)
+```
+\section{Unadjust}
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE, fig.width = 8, fig.height = 6}
+rm(list = ls())
+options(xtable.comment = FALSE)
+setwd(this.path::this.dir())
+df <- readRDS('../../tmp/covliquidity/pairwise_decom_table.Rds') %>%
+  dplyr::filter(micro == "yes",
+                name == "unlev",
+                liq_measure == "minus_spread") %>%
+  dplyr::select(-micro, -name, -liq_measure) %>%
+  dplyr::mutate(group_id = case_when(var == "combined"~1,
+                                     TRUE~2),
+                part_id = case_when(part=="total"~1,
+                                    TRUE~2)) %>%
+  dplyr::arrange(group_id, var, part_id, part, parameter) %>%
+  dplyr::select(-group_id, -part_id) 
+df.1 <- df %>%
+  dplyr::filter(var == "combined") %>%
+  dplyr::group_by(var) %>% 
+  dplyr::mutate(var = replace(var, row_number() != 1, NA)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(var, part) %>% 
+  dplyr::mutate(part = replace(part, parameter != "alpha", NA)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-parameter)
+
+
+
+
+
+
+data_table <- df.1 
+  
+
+align_vactor <- paste0("cc", paste0(rep("c", times = dim(data_table)[2] - 1), collapse = ""))
+caption_name_15 <- paste0("Decompose $R'_{t+1}\\cdot\\Pi_t\\cdot R_{t}$ Based on Pairwise Liquidity Comparison")
+x.side <- xtable(data_table, align = align_vactor, caption = caption_name_15)
+print(x.side, type = "latex", table.placement = "H", include.rownames = FALSE,
+      include.colnames = FALSE, scalebox = 0.9,
+          caption.placement = "top", #"top", NULL
+          hline.after=NULL, #We don't need hline; we use booktabs
+          floating=TRUE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+          sanitize.text.function = force , # Important to treat content of first column as latex function
+           add.to.row = list(pos = list(-1, 0, nrow(data_table)/3,  nrow(data_table)*2/3,
+                                          nrow(data_table)),
+                             command = c(paste("\\hline \n",  # NEW row
+                                               "Var&Part &$\\sum_{i=1}^N\\sum_{j=1}^NE(r_{i,t+1}\\Pi_{i,j}r_{i,t})$ & Illiquidity Leading& Self & Liquidity Leading & Diff
+                                               \\\\\n"),
+                                         paste("\\hline \n"),
+                 paste("\\hline \n"),
+                 paste("\\hline \n"), 
+                 paste("\\hline \n"))
+                 )
+)
+
+```
+\newpage
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE, fig.width = 8, fig.height = 6}
+rm(list = ls())
+options(xtable.comment = FALSE)
+df <- readRDS('../../tmp/covliquidity/pairwise_decom_table.Rds') %>%
+  dplyr::filter(micro == "yes",
+                name == "unlev",
+                liq_measure == "minus_spread") %>%
+  dplyr::select(-micro, -name, -liq_measure) %>%
+  dplyr::mutate(group_id = case_when(var == "combined"~1,
+                                     TRUE~2),
+                part_id = case_when(part=="total"~1,
+                                    TRUE~2)) %>%
+  dplyr::arrange(group_id, var, part_id, part, parameter) %>%
+  dplyr::select(-group_id, -part_id) 
+
+df.1 <- df %>%
+  dplyr::filter(var != "combined") %>%
+  dplyr::group_by(var) %>% 
+  dplyr::mutate(var = replace(var, row_number() != 1, NA)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(var, part) %>% 
+  dplyr::mutate(part = replace(part, parameter != "alpha", NA)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-parameter)
+
+
+
+
+
+
+data_table <- df.1 
+  
+
+align_vactor <- paste0("cc", paste0(rep("c", times = dim(data_table)[2] - 1), collapse = ""))
+caption_name_15 <- paste0("Decompose $R'_{t+1}\\cdot\\Pi_t\\cdot R_{t}$ Based on Pairwise Liquidity Comparison")
+x.side <- xtable(data_table, align = align_vactor, caption = caption_name_15)
+print(x.side, type = "latex", table.placement = "H", include.rownames = FALSE,
+      include.colnames = FALSE, scalebox = 0.75,
+          caption.placement = "top", #"top", NULL
+          hline.after=NULL, #We don't need hline; we use booktabs
+          floating=TRUE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+          sanitize.text.function = force , # Important to treat content of first column as latex function
+           add.to.row = list(pos = list(-1, 0, nrow(data_table)/8,  nrow(data_table)*2/8,
+                                        nrow(data_table)*3/8,  nrow(data_table)*4/8,
+                                        nrow(data_table)*5/8,  nrow(data_table)*6/8,
+                                        nrow(data_table)*7/8,
+                                          nrow(data_table)),
+                             command = c(paste("\\hline \n",  # NEW row
+                                               "Var&Part &$\\sum_{i=1}^N\\sum_{j=1}^NE(r_{i,t+1}\\Pi_{i,j}r_{i,t})$ & Illiquidity Leading& Self & Liquidity Leading & Diff
+                                               \\\\\n"),
+                                         paste("\\hline \n"),
+                 rep(paste("\\hline \n"), 8))
+                 )
+)
+
+```
+\newpage
+\section{Adjust}
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE, fig.width = 8, fig.height = 6}
+rm(list = ls())
+options(xtable.comment = FALSE)
+setwd(this.path::this.dir())
+df <- readRDS('../../tmp/covliquidity/pairwise_decom_table.Rds') %>%
+  dplyr::filter(micro == "yes",
+                name == "lev",
+                liq_measure == "minus_spread") %>%
+  dplyr::select(-micro, -name, -liq_measure) %>%
+  dplyr::mutate(group_id = case_when(var == "combined"~1,
+                                     TRUE~2),
+                part_id = case_when(part=="total"~1,
+                                    TRUE~2)) %>%
+  dplyr::arrange(group_id, var, part_id, part, parameter) %>%
+  dplyr::select(-group_id, -part_id) 
+df.1 <- df %>%
+  dplyr::filter(var == "combined") %>%
+  dplyr::group_by(var) %>% 
+  dplyr::mutate(var = replace(var, row_number() != 1, NA)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(var, part) %>% 
+  dplyr::mutate(part = replace(part, parameter != "alpha", NA)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-parameter)
+
+
+
+
+
+
+data_table <- df.1 
+  
+
+align_vactor <- paste0("cc", paste0(rep("c", times = dim(data_table)[2] - 1), collapse = ""))
+caption_name_15 <- paste0("Decompose $R'_{t+1}\\cdot\\Pi_t\\cdot R_{t}$ Based on Pairwise Liquidity Comparison")
+x.side <- xtable(data_table, align = align_vactor, caption = caption_name_15)
+print(x.side, type = "latex", table.placement = "H", include.rownames = FALSE,
+      include.colnames = FALSE, scalebox = 0.9,
+          caption.placement = "top", #"top", NULL
+          hline.after=NULL, #We don't need hline; we use booktabs
+          floating=TRUE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+          sanitize.text.function = force , # Important to treat content of first column as latex function
+           add.to.row = list(pos = list(-1, 0, nrow(data_table)/3,  nrow(data_table)*2/3,
+                                          nrow(data_table)),
+                             command = c(paste("\\hline \n",  # NEW row
+                                               "Var&Part &$\\sum_{i=1}^N\\sum_{j=1}^NE(r_{i,t+1}\\Pi_{i,j}r_{i,t})$ & Illiquidity Leading& Self & Liquidity Leading & Diff
+                                               \\\\\n"),
+                                         paste("\\hline \n"),
+                 paste("\\hline \n"),
+                 paste("\\hline \n"), 
+                 paste("\\hline \n"))
+                 )
+)
+
+```
+\newpage
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE, fig.width = 8, fig.height = 6}
+rm(list = ls())
+options(xtable.comment = FALSE)
+df <- readRDS('../../tmp/covliquidity/pairwise_decom_table.Rds') %>%
+  dplyr::filter(micro == "yes",
+                name == "lev",
+                liq_measure == "minus_spread") %>%
+  dplyr::select(-micro, -name, -liq_measure) %>%
+  dplyr::mutate(group_id = case_when(var == "combined"~1,
+                                     TRUE~2),
+                part_id = case_when(part=="total"~1,
+                                    TRUE~2)) %>%
+  dplyr::arrange(group_id, var, part_id, part, parameter) %>%
+  dplyr::select(-group_id, -part_id) 
+
+df.1 <- df %>%
+  dplyr::filter(var != "combined") %>%
+  dplyr::group_by(var) %>% 
+  dplyr::mutate(var = replace(var, row_number() != 1, NA)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(var, part) %>% 
+  dplyr::mutate(part = replace(part, parameter != "alpha", NA)) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(-parameter)
+
+
+
+
+
+
+data_table <- df.1 
+  
+
+align_vactor <- paste0("cc", paste0(rep("c", times = dim(data_table)[2] - 1), collapse = ""))
+caption_name_15 <- paste0("Decompose $R'_{t+1}\\cdot\\Pi_t\\cdot R_{t}$ Based on Pairwise Liquidity Comparison")
+x.side <- xtable(data_table, align = align_vactor, caption = caption_name_15)
+print(x.side, type = "latex", table.placement = "H", include.rownames = FALSE,
+      include.colnames = FALSE, scalebox = 0.75,
+          caption.placement = "top", #"top", NULL
+          hline.after=NULL, #We don't need hline; we use booktabs
+          floating=TRUE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+          sanitize.text.function = force , # Important to treat content of first column as latex function
+           add.to.row = list(pos = list(-1, 0, nrow(data_table)/8,  nrow(data_table)*2/8,
+                                        nrow(data_table)*3/8,  nrow(data_table)*4/8,
+                                        nrow(data_table)*5/8,  nrow(data_table)*6/8,
+                                        nrow(data_table)*7/8,
+                                          nrow(data_table)),
+                             command = c(paste("\\hline \n",  # NEW row
+                                               "Var&Part &$\\sum_{i=1}^N\\sum_{j=1}^NE(r_{i,t+1}\\Pi_{i,j}r_{i,t})$ & Illiquidity Leading& Self & Liquidity Leading & Diff
+                                               \\\\\n"),
+                                         paste("\\hline \n"),
+                 rep(paste("\\hline \n"), 8))
+                 )
+)
+
+```

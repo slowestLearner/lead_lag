@@ -1,0 +1,329 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[left=2cm,right=2cm,top=2.9cm,bottom=1.2cm]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage{booktabs}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\section{Total}
+\subsection{Adjust}
+
+The stock base is: all
+
+\begin{table}[H]
+\centering
+\caption{Decompose $R'_{t+1}\cdot\Pi_t\cdot R_{t}$ Based on Pairwise Liquidity Comparison} 
+\scalebox{0.9}{
+\begin{tabular}{lcccccccccc}
+  \hline 
+ Liq measure:&\multicolumn{5}{c}{\textbf{Bid-ask spread}}
+                                                 & \multicolumn{5}{c}{\textbf{Trading Volume}}
+                                                 \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+  & All& Illiq$\rightarrow$Liq & Self &Liq$\rightarrow$illiq  & Diff & All& Illiq$\rightarrow$Liq & Self & Liq$\rightarrow$illiq & Diff  \\
+ & (1) & (2) & (3) & (4)& (5) & (6) & (7) & (8)& (9) & (10)  \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+ combined & 0.012 & 0.008 & 0.001 & 0.014 & 0.005 & 0.012 & 0.007 & 0.000 & 0.014 & 0.006 \\ 
+   & (6.49) & (5.47) & (1.28) & (6.89) & (5.84) & (6.49) & (4.55) & (0.98) & (6.98) & (6.93) \\ 
+  Indu & 0.012 & 0.008 & 0.006 & 0.013 & 0.005 & 0.012 & 0.008 & 0.000 & 0.013 & 0.005 \\ 
+   & (6.56) & (5.51) & (1.55) & (6.70) & (5.05) & (6.56) & (4.68) & (0.90) & (6.68) & (5.36) \\ 
+  BEAcustomer & 0.012 & 0.008 & 0.002 & 0.013 & 0.005 & 0.012 & 0.007 & 0.002 & 0.013 & 0.006 \\ 
+   & (7.03) & (5.75) & (1.42) & (7.34) & (5.53) & (7.03) & (4.28) & (1.36) & (7.45) & (6.50) \\ 
+  BEAsupplier & 0.012 & 0.008 & 0.001 & 0.014 & 0.006 & 0.012 & 0.007 & 0.001 & 0.013 & 0.006 \\ 
+   & (6.97) & (5.60) & (0.79) & (7.25) & (5.58) & (6.97) & (4.22) & (0.42) & (7.34) & (6.14) \\ 
+  Tec & 0.016 & 0.010 & -0.000 & 0.020 & 0.010 & 0.016 & 0.008 & -0.000 & 0.020 & 0.011 \\ 
+   & (6.32) & (4.56) & (NaN) & (7.12) & (7.70) & (6.32) & (3.77) & (NaN) & (7.77) & (9.13) \\ 
+  Geo & 0.013 & 0.008 & -0.004 & 0.018 & 0.009 & 0.013 & 0.008 & -0.000 & 0.017 & 0.010 \\ 
+   & (5.96) & (4.26) & (-0.84) & (6.93) & (5.97) & (5.96) & (3.57) & (NaN) & (7.54) & (7.30) \\ 
+  Pseudo & 0.013 & 0.009 & 0.003 & 0.015 & 0.006 & 0.013 & 0.008 & 0.004 & 0.014 & 0.005 \\ 
+   & (6.66) & (5.29) & (0.69) & (6.93) & (5.10) & (6.66) & (4.63) & (0.95) & (6.98) & (4.97) \\ 
+  Econ & 0.009 & 0.008 & -0.000 & 0.010 & 0.002 & 0.009 & 0.004 & -0.000 & 0.010 & 0.006 \\ 
+   & (5.36) & (4.79) & (NaN) & (5.23) & (1.75) & (5.36) & (2.17) & (NaN) & (5.52) & (3.81) \\ 
+  Analyst & 0.013 & 0.011 & -0.000 & 0.017 & 0.006 & 0.013 & 0.009 & -0.001 & 0.017 & 0.007 \\ 
+   & (5.05) & (4.65) & (-0.19) & (5.96) & (6.02) & (5.05) & (3.78) & (-0.38) & (6.35) & (7.97) \\ 
+   \hline 
+\end{tabular}
+}
+\end{table}
+
+The stock base is: large
+
+\begin{table}[H]
+\centering
+\caption{Decompose $R'_{t+1}\cdot\Pi_t\cdot R_{t}$ Based on Pairwise Liquidity Comparison} 
+\scalebox{0.9}{
+\begin{tabular}{lcccccccccc}
+  \hline 
+ Liq measure:&\multicolumn{5}{c}{\textbf{Bid-ask spread}}
+                                                 & \multicolumn{5}{c}{\textbf{Trading Volume}}
+                                                 \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+  & All& Illiq$\rightarrow$Liq & Self &Liq$\rightarrow$illiq  & Diff & All& Illiq$\rightarrow$Liq & Self & Liq$\rightarrow$illiq & Diff  \\
+ & (1) & (2) & (3) & (4)& (5) & (6) & (7) & (8)& (9) & (10)  \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+ combined & 0.008 & 0.007 & 0.001 & 0.008 & 0.001 & 0.008 & 0.006 & 0.001 & 0.008 & 0.002 \\ 
+   & (4.85) & (4.75) & (1.63) & (4.80) & (2.06) & (4.85) & (4.12) & (1.75) & (5.05) & (3.18) \\ 
+  Indu & 0.008 & 0.007 & 0.003 & 0.008 & 0.001 & 0.008 & 0.007 & -0.000 & 0.008 & 0.001 \\ 
+   & (4.88) & (4.81) & (1.62) & (4.77) & (1.69) & (4.88) & (4.24) & (NaN) & (4.94) & (2.14) \\ 
+  BEAcustomer & 0.007 & 0.007 & 0.002 & 0.007 & 0.001 & 0.007 & 0.006 & 0.002 & 0.008 & 0.002 \\ 
+   & (4.46) & (4.74) & (1.60) & (4.39) & (1.18) & (4.46) & (3.90) & (1.59) & (4.76) & (2.36) \\ 
+  BEAsupplier & 0.007 & 0.006 & 0.002 & 0.008 & 0.002 & 0.007 & 0.006 & 0.001 & 0.007 & 0.001 \\ 
+   & (4.24) & (4.27) & (1.19) & (4.19) & (1.93) & (4.24) & (3.75) & (1.07) & (4.47) & (2.02) \\ 
+  Tec & 0.011 & 0.009 & -0.000 & 0.011 & 0.002 & 0.011 & 0.008 & -0.000 & 0.012 & 0.004 \\ 
+   & (4.67) & (4.50) & (NaN) & (4.40) & (1.95) & (4.67) & (3.57) & (NaN) & (5.22) & (4.91) \\ 
+  Geo & 0.008 & 0.007 & -0.001 & 0.008 & 0.001 & 0.008 & 0.007 & -0.000 & 0.008 & 0.002 \\ 
+   & (3.78) & (3.78) & (-0.77) & (3.50) & (1.28) & (3.78) & (3.18) & (NaN) & (4.07) & (2.76) \\ 
+  Pseudo & 0.008 & 0.007 & 0.004 & 0.008 & 0.001 & 0.008 & 0.007 & 0.004 & 0.008 & 0.001 \\ 
+   & (4.18) & (4.09) & (1.20) & (4.04) & (1.01) & (4.18) & (3.66) & (1.20) & (4.25) & (1.46) \\ 
+  Econ & 0.005 & 0.006 & -0.000 & 0.004 & -0.001 & 0.005 & 0.004 & -0.000 & 0.005 & 0.001 \\ 
+   & (2.87) & (3.60) & (NaN) & (2.33) & (-1.27) & (2.87) & (2.02) & (NaN) & (2.87) & (0.79) \\ 
+  Analyst & 0.009 & 0.008 & 0.002 & 0.010 & 0.002 & 0.009 & 0.007 & 0.002 & 0.010 & 0.003 \\ 
+   & (3.42) & (3.51) & (1.10) & (3.65) & (2.46) & (3.42) & (2.89) & (1.01) & (4.00) & (4.64) \\ 
+   \hline 
+\end{tabular}
+}
+\end{table}
+\newpage
+\section{Asy}
+\subsection{Adjust}
+
+The stock base is: all
+
+\begin{table}[H]
+\centering
+\caption{Decompose $R'_{t+1}\cdot\Pi_t\cdot R_{t}$ Based on Pairwise Liquidity Comparison} 
+\scalebox{0.9}{
+\begin{tabular}{lcccccccccc}
+  \hline 
+ Liq measure:&\multicolumn{5}{c}{\textbf{Bid-ask spread}}
+                                                 & \multicolumn{5}{c}{\textbf{Trading Volume}}
+                                                 \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+  & All& Illiq$\rightarrow$Liq & Self &Liq$\rightarrow$illiq  & Diff & All& Illiq$\rightarrow$Liq & Self & Liq$\rightarrow$illiq & Diff  \\
+ & (1) & (2) & (3) & (4)& (5) & (6) & (7) & (8)& (9) & (10)  \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+ combined & 0.004 & -0.002 & -0.000 & 0.010 & 0.012 & 0.004 & -0.004 & -0.000 & 0.011 & 0.015 \\ 
+   & (5.48) & (-2.20) & (-0.05) & (6.02) & (4.84) & (5.48) & (-3.21) & (-1.14) & (6.14) & (5.22) \\ 
+  Indu & 0.004 & -0.003 & 0.002 & 0.012 & 0.015 & 0.004 & -0.005 & -0.000 & 0.013 & 0.018 \\ 
+   & (5.27) & (-2.49) & (0.53) & (6.64) & (5.43) & (5.27) & (-3.47) & (NaN) & (6.67) & (5.70) \\ 
+  BEAcustomer & 0.006 & -0.001 & -0.005 & 0.011 & 0.012 & 0.006 & -0.003 & -0.000 & 0.012 & 0.015 \\ 
+   & (7.46) & (-0.74) & (-1.15) & (7.75) & (5.30) & (7.46) & (-2.15) & (NaN) & (7.47) & (5.47) \\ 
+  BEAsupplier & 0.005 & -0.002 & 0.000 & 0.011 & 0.013 & 0.005 & -0.003 & -0.000 & 0.012 & 0.015 \\ 
+   & (6.05) & (-1.30) & (0.09) & (7.82) & (5.82) & (6.05) & (-2.49) & (-1.14) & (7.66) & (5.88) \\ 
+  Tec & 0.003 & -0.001 & -0.000 & 0.008 & 0.009 & 0.003 & -0.003 & -0.000 & 0.010 & 0.013 \\ 
+   & (4.73) & (-1.23) & (NaN) & (7.15) & (5.45) & (4.73) & (-2.59) & (NaN) & (7.30) & (5.75) \\ 
+  Geo & 0.000 & -0.000 & 0.005 & 0.000 & 0.000 & 0.000 & 0.000 & -0.000 & 0.000 & -0.000 \\ 
+   & (0.32) & (-0.19) & (1.11) & (0.27) & (0.43) & (0.32) & (0.19) & (NaN) & (0.07) & (-0.10) \\ 
+  Pseudo & 0.004 & 0.000 & 0.000 & 0.008 & 0.008 & 0.004 & -0.001 & -0.000 & 0.009 & 0.010 \\ 
+   & (6.23) & (0.43) & (0.48) & (8.26) & (6.34) & (6.23) & (-1.18) & (NaN) & (7.76) & (5.34) \\ 
+  Econ & 0.003 & -0.000 & -0.000 & 0.007 & 0.007 & 0.003 & -0.002 & -0.000 & 0.008 & 0.011 \\ 
+   & (4.66) & (-0.20) & (NaN) & (4.96) & (3.42) & (4.66) & (-1.79) & (NaN) & (5.49) & (4.21) \\ 
+  Analyst & 0.006 & -0.001 & -0.002 & 0.012 & 0.014 & 0.006 & -0.005 & -0.000 & 0.015 & 0.020 \\ 
+   & (7.63) & (-1.07) & (-0.57) & (8.11) & (5.39) & (7.63) & (-2.55) & (NaN) & (6.70) & (4.91) \\ 
+   \hline 
+\end{tabular}
+}
+\end{table}
+
+The stock base is: large
+
+\begin{table}[H]
+\centering
+\caption{Decompose $R'_{t+1}\cdot\Pi_t\cdot R_{t}$ Based on Pairwise Liquidity Comparison} 
+\scalebox{0.9}{
+\begin{tabular}{lcccccccccc}
+  \hline 
+ Liq measure:&\multicolumn{5}{c}{\textbf{Bid-ask spread}}
+                                                 & \multicolumn{5}{c}{\textbf{Trading Volume}}
+                                                 \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+  & All& Illiq$\rightarrow$Liq & Self &Liq$\rightarrow$illiq  & Diff & All& Illiq$\rightarrow$Liq & Self & Liq$\rightarrow$illiq & Diff  \\
+ & (1) & (2) & (3) & (4)& (5) & (6) & (7) & (8)& (9) & (10)  \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+ combined & 0.001 & -0.002 & -0.000 & 0.004 & 0.006 & 0.001 & -0.004 & -0.000 & 0.006 & 0.010 \\ 
+   & (3.17) & (-1.81) & (-0.18) & (3.87) & (3.17) & (3.17) & (-3.13) & (NaN) & (4.40) & (3.98) \\ 
+  Indu & 0.002 & -0.002 & 0.002 & 0.006 & 0.008 & 0.002 & -0.005 & -0.000 & 0.008 & 0.013 \\ 
+   & (2.82) & (-2.15) & (2.02) & (4.40) & (3.77) & (2.82) & (-3.51) & (NaN) & (4.80) & (4.42) \\ 
+  BEAcustomer & 0.002 & -0.001 & -0.000 & 0.004 & 0.005 & 0.002 & -0.003 & -0.000 & 0.006 & 0.009 \\ 
+   & (3.10) & (-0.92) & (-0.11) & (4.16) & (3.24) & (3.10) & (-2.53) & (NaN) & (4.26) & (3.66) \\ 
+  BEAsupplier & 0.001 & -0.001 & -0.003 & 0.004 & 0.005 & 0.001 & -0.003 & -0.000 & 0.005 & 0.008 \\ 
+   & (2.16) & (-1.34) & (-1.79) & (3.99) & (3.56) & (2.16) & (-2.50) & (NaN) & (4.38) & (3.84) \\ 
+  Tec & 0.001 & -0.000 & -0.000 & 0.002 & 0.003 & 0.001 & -0.003 & -0.000 & 0.005 & 0.008 \\ 
+   & (1.71) & (-0.50) & (NaN) & (3.08) & (2.46) & (1.71) & (-2.75) & (NaN) & (4.80) & (4.24) \\ 
+  Geo & 0.000 & -0.000 & 0.001 & 0.001 & 0.001 & 0.000 & 0.000 & -0.000 & 0.000 & -0.000 \\ 
+   & (0.37) & (-0.13) & (0.51) & (0.59) & (0.66) & (0.37) & (0.49) & (NaN) & (0.18) & (-0.26) \\ 
+  Pseudo & 0.002 & 0.002 & -0.000 & 0.002 & 0.000 & 0.002 & 0.000 & -0.000 & 0.003 & 0.003 \\ 
+   & (4.30) & (3.36) & (NaN) & (3.51) & (0.68) & (4.30) & (0.05) & (NaN) & (4.66) & (2.80) \\ 
+  Econ & 0.001 & -0.000 & -0.000 & 0.001 & 0.001 & 0.001 & -0.003 & -0.000 & 0.004 & 0.007 \\ 
+   & (0.92) & (-0.09) & (NaN) & (1.11) & (0.83) & (0.92) & (-2.52) & (NaN) & (2.89) & (2.98) \\ 
+  Analyst & 0.002 & -0.001 & -0.001 & 0.005 & 0.006 & 0.002 & -0.004 & -0.000 & 0.008 & 0.013 \\ 
+   & (4.03) & (-0.61) & (-0.44) & (4.99) & (3.44) & (4.03) & (-2.19) & (NaN) & (3.94) & (3.16) \\ 
+   \hline 
+\end{tabular}
+}
+\end{table}
+
+\newpage
+\section{Sym}
+
+\subsection{Adjust}
+
+The stock base is: all
+
+\begin{table}[H]
+\centering
+\caption{Decompose $R'_{t+1}\cdot\Pi_t\cdot R_{t}$ Based on Pairwise Liquidity Comparison} 
+\scalebox{0.9}{
+\begin{tabular}{lcccccccccc}
+  \hline 
+ Liq measure:&\multicolumn{5}{c}{\textbf{Bid-ask spread}}
+                                                 & \multicolumn{5}{c}{\textbf{Trading Volume}}
+                                                 \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+  & All& Illiq$\rightarrow$Liq & Self &Liq$\rightarrow$illiq  & Diff & All& Illiq$\rightarrow$Liq & Self & Liq$\rightarrow$illiq & Diff  \\
+ & (1) & (2) & (3) & (4)& (5) & (6) & (7) & (8)& (9) & (10)  \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+ combined & 0.010 & 0.007 & 0.001 & 0.013 & 0.006 & 0.010 & 0.006 & 0.000 & 0.013 & 0.007 \\ 
+   & (5.98) & (4.64) & (1.49) & (6.72) & (5.86) & (5.98) & (4.17) & (0.98) & (6.98) & (6.52) \\ 
+  Indu & 0.009 & 0.006 & 0.007 & 0.012 & 0.006 & 0.009 & 0.006 & 0.000 & 0.013 & 0.007 \\ 
+   & (5.75) & (4.32) & (1.98) & (6.47) & (5.31) & (5.75) & (3.93) & (0.90) & (6.69) & (5.71) \\ 
+  BEAcustomer & 0.009 & 0.005 & 0.002 & 0.012 & 0.007 & 0.009 & 0.005 & 0.002 & 0.013 & 0.008 \\ 
+   & (5.63) & (3.69) & (1.41) & (6.88) & (6.48) & (5.63) & (3.08) & (1.36) & (7.36) & (7.24) \\ 
+  BEAsupplier & 0.010 & 0.006 & 0.001 & 0.013 & 0.007 & 0.010 & 0.005 & 0.001 & 0.013 & 0.007 \\ 
+   & (5.87) & (4.18) & (0.75) & (6.83) & (5.53) & (5.87) & (3.46) & (0.42) & (7.25) & (6.13) \\ 
+  Tec & 0.015 & 0.009 & -0.000 & 0.020 & 0.010 & 0.015 & 0.008 & -0.000 & 0.020 & 0.012 \\ 
+   & (6.02) & (4.32) & (NaN) & (7.01) & (7.79) & (6.02) & (3.67) & (NaN) & (7.73) & (9.27) \\ 
+  Geo & 0.013 & 0.008 & -0.004 & 0.018 & 0.009 & 0.013 & 0.008 & -0.000 & 0.017 & 0.010 \\ 
+   & (5.95) & (4.23) & (-0.83) & (6.95) & (6.11) & (5.95) & (3.56) & (NaN) & (7.52) & (7.41) \\ 
+  Pseudo & 0.010 & 0.007 & 0.003 & 0.012 & 0.005 & 0.010 & 0.006 & 0.004 & 0.013 & 0.007 \\ 
+   & (5.52) & (4.21) & (0.85) & (6.01) & (4.88) & (5.52) & (3.42) & (0.95) & (6.68) & (5.74) \\ 
+  Econ & 0.006 & 0.003 & -0.000 & 0.009 & 0.006 & 0.006 & 0.003 & -0.000 & 0.010 & 0.007 \\ 
+   & (4.03) & (2.30) & (NaN) & (5.15) & (5.50) & (4.03) & (1.93) & (NaN) & (5.48) & (5.66) \\ 
+  Analyst & 0.012 & 0.010 & -0.000 & 0.016 & 0.006 & 0.012 & 0.009 & -0.001 & 0.016 & 0.008 \\ 
+   & (4.50) & (4.12) & (-0.18) & (5.56) & (5.91) & (4.50) & (3.51) & (-0.38) & (6.17) & (8.14) \\ 
+   \hline 
+\end{tabular}
+}
+\end{table}
+
+The stock base is: large
+
+\begin{table}[H]
+\centering
+\caption{Decompose $R'_{t+1}\cdot\Pi_t\cdot R_{t}$ Based on Pairwise Liquidity Comparison} 
+\scalebox{0.9}{
+\begin{tabular}{lcccccccccc}
+  \hline 
+ Liq measure:&\multicolumn{5}{c}{\textbf{Bid-ask spread}}
+                                                 & \multicolumn{5}{c}{\textbf{Trading Volume}}
+                                                 \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+  & All& Illiq$\rightarrow$Liq & Self &Liq$\rightarrow$illiq  & Diff & All& Illiq$\rightarrow$Liq & Self & Liq$\rightarrow$illiq & Diff  \\
+ & (1) & (2) & (3) & (4)& (5) & (6) & (7) & (8)& (9) & (10)  \\
+ \cmidrule(l){2-6} \cmidrule(l){7-11}
+ combined & 0.007 & 0.006 & 0.001 & 0.008 & 0.001 & 0.007 & 0.006 & 0.001 & 0.008 & 0.002 \\ 
+   & (4.72) & (4.48) & (1.63) & (4.71) & (2.31) & (4.72) & (4.02) & (1.75) & (5.08) & (3.31) \\ 
+  Indu & 0.007 & 0.006 & 0.003 & 0.008 & 0.002 & 0.007 & 0.006 & -0.000 & 0.008 & 0.002 \\ 
+   & (4.63) & (4.32) & (1.62) & (4.66) & (2.30) & (4.63) & (3.92) & (NaN) & (5.03) & (2.94) \\ 
+  BEAcustomer & 0.007 & 0.006 & 0.002 & 0.007 & 0.001 & 0.007 & 0.005 & 0.002 & 0.008 & 0.002 \\ 
+   & (4.21) & (4.15) & (1.60) & (4.17) & (1.57) & (4.21) & (3.45) & (1.59) & (4.83) & (3.32) \\ 
+  BEAsupplier & 0.007 & 0.006 & 0.002 & 0.007 & 0.001 & 0.007 & 0.006 & 0.001 & 0.007 & 0.002 \\ 
+   & (4.10) & (4.10) & (1.20) & (3.95) & (1.38) & (4.10) & (3.49) & (1.07) & (4.52) & (2.44) \\ 
+  Tec & 0.010 & 0.009 & -0.000 & 0.011 & 0.002 & 0.010 & 0.008 & -0.000 & 0.012 & 0.004 \\ 
+   & (4.54) & (4.31) & (NaN) & (4.38) & (2.25) & (4.54) & (3.58) & (NaN) & (5.16) & (4.94) \\ 
+  Geo & 0.008 & 0.007 & -0.001 & 0.008 & 0.002 & 0.008 & 0.007 & -0.000 & 0.008 & 0.002 \\ 
+   & (3.80) & (3.76) & (-0.76) & (3.53) & (1.40) & (3.80) & (3.21) & (NaN) & (4.06) & (2.78) \\ 
+  Pseudo & 0.007 & 0.006 & 0.004 & 0.007 & 0.001 & 0.007 & 0.005 & 0.004 & 0.007 & 0.002 \\ 
+   & (3.71) & (3.69) & (1.20) & (3.44) & (1.01) & (3.71) & (3.07) & (1.20) & (4.09) & (2.56) \\ 
+  Econ & 0.004 & 0.004 & -0.000 & 0.005 & 0.001 & 0.004 & 0.004 & -0.000 & 0.005 & 0.001 \\ 
+   & (2.89) & (2.77) & (NaN) & (2.66) & (0.92) & (2.89) & (2.61) & (NaN) & (2.78) & (0.72) \\ 
+  Analyst & 0.008 & 0.008 & 0.002 & 0.009 & 0.002 & 0.008 & 0.007 & 0.002 & 0.010 & 0.003 \\ 
+   & (3.22) & (3.30) & (1.10) & (3.43) & (2.23) & (3.22) & (2.77) & (1.01) & (3.96) & (4.91) \\ 
+   \hline 
+\end{tabular}
+}
+\end{table}
+
+\end{document}

@@ -1,0 +1,146 @@
+---
+author: ""
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{float}
+   - \usepackage{natbib}
+   - \usepackage{booktabs}
+   - \usepackage{multirow}
+geometry: "left=1cm,right=1cm,top=0.9cm,bottom=1.2cm"
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    number_sections: true
+#bibliography: ref.bib
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE}
+rm(list = ls())
+options(xtable.comment = FALSE)
+library(reshape)
+library(data.table)
+library(dplyr)
+library(naniar)
+library(scales)
+library(tidyr)
+library(xtable)
+library(pracma)
+library(this.path)
+setwd(this.path::this.dir())
+
+# regression results
+data <- readRDS("../../../../tests/27_sym_mechanism_tests/tmp/liquidity/deciles/require_equal_weight_for_total_signal/statistics_deciles_and_quintiles.RDS") %>%
+  filter(grepl("combined", var)) %>%
+  filter(var_type != "total") %>%
+  filter(sort_type == "decile") %>%
+  filter(liq_var == "me") %>%
+  rename(coef = ret1) %>%
+  mutate(coef = 100 * coef, se = 100 * se) %>%
+  mutate(tstat = coef / se) %>%
+  select(-liq_var, -sort_type, -obs, -n_permno, -sum_abs_signal)
+
+# sort specifications
+tmp <- unique(data[, .(var)]) %>%
+  arrange(var) %>%
+  mutate(var_idx = c(1, 3, 2))
+data <- merge(data, tmp, by = "var")
+rm(tmp)
+
+# sort var_type
+tmp <- data.table(var_type = c("sym", "asy"), var_type_idx = 1:2)
+data <- merge(data, tmp, by = "var_type")
+rm(tmp)
+
+# liquidity values
+liq_data <- dcast(data[var_type == "sym"], var_idx ~ bin_liq, value.var = "liq_value")
+liq_data <- cbind(liq_data[, 1], data.table(var_type_idx = 0, liq_data[, -1])) %>%
+  mutate_at(vars(3:13), ~ comma(.)) %>%
+  mutate(group_id = 100 * row_number(), type = "liq_value")
+liq_data[, 13] <- ""
+
+# add stars
+cuts <- abs(qnorm(c(.01, .05, .1) / 2))
+data[, abs_tstat := abs(coef / se)]
+data[, ss := ifelse(abs_tstat > cuts[1], 3, ifelse(abs_tstat > cuts[2], 2, ifelse(abs_tstat > cuts[3], 1, 0)))]
+data[, coef_lab := paste0("$", sprintf("%.2f", coef))]
+data[, ss_lab := sapply(data[, ss], function(x) {
+  ifelse(x > 0,
+    paste0("^{", strcat(rep("*", x)), "}$"),
+    "$"
+  )
+})]
+data[, coef_lab := paste0(coef_lab, ss_lab)]
+data[, ss_lab := NULL]
+
+est <- dcast(data, var_idx + var_type_idx ~ bin_liq, value.var = "coef_lab") %>%
+  mutate(group_id = 100 * row_number() + 1, type = "coef")
+est[is.na(est)] <- ""
+
+se <- cast(data, var_idx + var_type_idx ~ bin_liq, value = "se") %>%
+  dplyr::mutate(group_id = 100 * row_number() + 2, type = "se") %>%
+  dplyr::mutate_at(vars(3:13), ~ paste0("$(", sprintf("%.2f", round(., 2)), ")$"))
+se[se == "$(NA)$"] <- ""
+
+tbl <- bind_rows(liq_data, est, se) %>%
+  arrange(var_idx, var_type_idx) %>%
+  select(-group_id, -type)
+rm(est, se, liq_data)
+
+tbl[, var_idx := c("", "", "Full sample", "", "", "", "", "1926 - 1962", "", "", "", "", "1963 - 2023", "", "")]
+tbl[, var_type_idx := rep(c("Market cap (\\$ m)", "Symmetric ret (\\%)", "", "Asymmetric ret (\\%)", ""), 3)]
+
+# # add col columns
+# col_names <- data.table(t(as.data.frame(c("", "", paste0("(", 1:(ncol(tbl) - 2), ")")))))
+# names(col_names) <- names(tbl)
+# tbl <- bind_rows(col_names, tbl)
+# rm(col_names)
+
+align_vactor <- paste0("ll", paste0(rep("c", times = ncol(tbl) - 1), collapse = ""))
+x.side <- xtable(tbl, align = align_vactor)
+
+this_add_to_row <- list(
+  pos = list(-1, 0, 2, 4, 5, 7, 9, 10, 12, 14, nrow(tbl)),
+  command = c(
+    "\\toprule & & \\multicolumn{11}{c}{Bins sorted by market cap} \\\\\n \\cmidrule(l){3-13} ",
+    "& & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 10 - 1 \\\\\n \\cmidrule(l){3-13} \\vspace{5pt}",
+    rep(c(
+      "\\vspace{5pt}",
+      "\\vspace{5pt}",
+      "\\hline \\vspace{5pt} "
+    ), 2),
+    rep("\\vspace{5pt}", 2),
+    "\\bottomrule \n"
+  )
+)
+
+print(x.side,
+  type = "latex",
+  table.placement = "!ht",
+  include.rownames = FALSE,
+  include.colnames = FALSE,
+  tabular.environment = "tabular",
+  caption.placement = NULL, # "top", NULL
+  hline.after = NULL, # We don't need hline; we use booktabs
+  floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+  sanitize.text.function = force, # Important to treat content of first column as latex function
+  add.to.row = this_add_to_row
+)
+
+print(x.side,
+  type = "latex",
+  table.placement = "!ht",
+  include.rownames = FALSE,
+  include.colnames = FALSE,
+  tabular.environment = "tabular",
+  caption.placement = NULL, # "top", NULL
+  hline.after = NULL, # We don't need hline; we use booktabs
+  floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+  sanitize.text.function = force, # Important to treat content of first column as latex function
+  add.to.row = this_add_to_row,
+  file = "profit_by_liquidity.tex"
+)
+```

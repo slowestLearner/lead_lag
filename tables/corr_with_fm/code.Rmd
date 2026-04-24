@@ -1,0 +1,123 @@
+---
+author: ""
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{float}
+   - \usepackage{natbib}
+   - \usepackage{booktabs}
+   - \usepackage{multirow}
+geometry: "left=1cm,right=1cm,top=0.9cm,bottom=1.2cm"
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    number_sections: true
+#bibliography: ref.bib
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE}
+rm(list = ls())
+options(xtable.comment = FALSE)
+library(reshape)
+library(data.table)
+library(dplyr)
+library(naniar)
+library(scales)
+library(tidyr)
+library(xtable)
+library(this.path)
+library(fs)
+
+# set working directory to be the root of the code
+setwd(this.path::this.dir())
+
+
+for (stock_base in c("all", "large")){
+  # get correlations
+  data <- readRDS(paste0("../../tmp/sym/", stock_base, "/summaries/cor_with_fm.RDS"))
+  
+  # rank the variables
+  tmp <- readRDS(paste0("../../tmp/processed_signals/", stock_base, "/signal_availability.RDS")) %>%
+    group_by(var, var_lab) %>%
+    summarize(first_ym = min(yyyymm)) %>%
+    ungroup() %>%
+    arrange(first_ym) %>%
+    mutate(var = gsub("_ret", "", var)) %>%
+    bind_rows(., data.table(
+      var = c("combined", "combined_1926_1962", "combined_1963_2023"),
+      var_lab = c("Combined (full sample)", "Combined (1926-1962)", "Combined (1963-2023)"), first_ym = 1:3
+    )) %>%
+    arrange(first_ym) %>%
+    mutate(idx = row_number()) %>%
+    select(-first_ym) %>%
+    mutate(var = ifelse(var == "indu", "industry",
+      ifelse(var == "tec", "tech", var)
+    )) %>%
+    setDT()
+  
+  data <- merge(data, tmp, by = "var")
+  rm(tmp)
+  
+  # get sample sizes
+  sample_size <- data[, .(var_lab, obs)] %>%
+    unique() %>%
+    mutate(obs = comma(obs))
+  
+  # put into table format
+  data <- data %>%
+    mutate(cor_with_fm = sprintf("%.1f", 100 * cor_with_fm)) %>%
+    mutate(cor_with_fm = paste0("$", cor_with_fm, "\\%$")) %>%
+    dcast(idx + var_lab ~ var_type, value.var = "cor_with_fm") %>%
+    inner_join(sample_size, by = c("var_lab")) %>%
+    arrange(idx) %>%
+    select(-idx) %>%
+    setDT() %>%
+    setcolorder(c("var_lab", "obs", "total", "sym", "asy"))
+  rm(sample_size)
+  
+  # add col columns
+  col_names <- data.table(t(as.data.frame(c("", paste0("(", 1:(ncol(data) - 1), ")")))))
+  names(col_names) <- names(data)
+  data <- rbind(col_names, data)
+  rm(col_names)
+  
+  align_vector <- paste0("ll", paste0(rep("r", times = ncol(data) - 1), collapse = ""))
+  x.side <- xtable(data, align = align_vector)
+  
+  this_add_to_row <- list(
+    pos = list(-1, -1, -1, 3, nrow(data)),
+    command = c(
+      "\\toprule \\multirow{2}{*}{Predictor} & \\multirow{2}{*}{Obs} & \\multicolumn{3}{c}{Correlation with FM} \\\\\n \\cmidrule(l){3-5}",
+      "& & CSM & Symmetric & Asymmetric \\\\\n \\cmidrule(l){2-5}",
+      rep("\\vspace{5pt}", 2), "\\bottomrule"
+    )
+  )
+  cat("The stock base is:", stock_base)
+  print(x.side,
+    type = "latex", table.placement = "!ht", include.rownames = FALSE,
+    include.colnames = F,
+    caption.placement = "top", # "top", NULL
+    hline.after = NULL, # We don't need hline; we use booktabs
+    floating = F, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+    sanitize.text.function = force, # Important to treat content of first column as latex function
+    add.to.row = this_add_to_row
+  )
+  
+  out_dir <- paste0(stock_base, "/")
+  dir_create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  print(x.side,
+    type = "latex", table.placement = "!ht", include.rownames = FALSE,
+    include.colnames = F,
+    caption.placement = "top", # "top", NULL
+    hline.after = NULL, # We don't need hline; we use booktabs
+    floating = F, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+    sanitize.text.function = force, # Important to treat content of first column as latex function
+    add.to.row = this_add_to_row,
+    file = paste0(stock_base, "/cor_with_fm.tex")
+  )
+}
+```

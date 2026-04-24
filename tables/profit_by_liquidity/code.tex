@@ -1,0 +1,98 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[left=1cm,right=1cm,top=0.9cm,bottom=1.2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\begin{tabular}{lcccccccccccc}
+  \toprule & & \multicolumn{11}{c}{Bins sorted by market cap} \\
+ \cmidrule(l){3-13}   & & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 10 - 1 \\
+ \cmidrule(l){3-13} \vspace{5pt} & Market cap (\$ m) & 6.8 & 18.5 & 36 & 65 & 112 & 195 & 347 & 652 & 1,493 & 12,082 &  \\ 
+   & Symmetric ret (\%) & $0.03^{*}$ & $0.05^{***}$ & $0.07^{***}$ & $0.07^{***}$ & $0.08^{***}$ & $0.08^{***}$ & $0.08^{***}$ & $0.08^{***}$ & $0.10^{***}$ & $0.18^{***}$ & $0.15^{***}$ \\ 
+   \vspace{5pt}Full sample &  & $(0.02)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.02)$ & $(0.04)$ & $(0.04)$ \\ 
+   & Asymmetric ret (\%) & $0.04^{***}$ & $0.04^{***}$ & $0.04^{***}$ & $0.05^{***}$ & $0.04^{***}$ & $0.04^{***}$ & $0.02^{***}$ & $0.02^{***}$ & $-0.01$ & $-0.10^{***}$ & $-0.14^{***}$ \\ 
+   \vspace{5pt} &  & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.03)$ & $(0.03)$ \\ 
+   \hline \vspace{5pt}  & Market cap (\$ m) & 2.5 & 5.6 & 9 & 13 & 20 & 29 & 44 & 72 & 140 & 659 &  \\ 
+   & Symmetric ret (\%) & $-0.01$ & $0.00$ & $0.04^{**}$ & $0.03^{**}$ & $0.04^{***}$ & $0.05^{***}$ & $0.06^{***}$ & $0.06^{**}$ & $0.09^{***}$ & $0.28^{***}$ & $0.29^{***}$ \\ 
+   \vspace{5pt}1926 - 1962 &  & $(0.03)$ & $(0.02)$ & $(0.02)$ & $(0.02)$ & $(0.02)$ & $(0.02)$ & $(0.02)$ & $(0.02)$ & $(0.03)$ & $(0.06)$ & $(0.07)$ \\ 
+   & Asymmetric ret (\%) & $-0.01$ & $0.00$ & $0.03^{**}$ & $0.03^{**}$ & $0.04^{***}$ & $0.04^{***}$ & $0.02^{*}$ & $0.02$ & $-0.01$ & $-0.18^{***}$ & $-0.17^{***}$ \\ 
+   \vspace{5pt} &  & $(0.03)$ & $(0.01)$ & $(0.01)$ & $(0.02)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.02)$ & $(0.05)$ & $(0.05)$ \\ 
+   \hline \vspace{5pt}  & Market cap (\$ m) & 9.5 & 26.3 & 53 & 96 & 167 & 296 & 532 & 1,004 & 2,314 & 19,010 &  \\ 
+   & Symmetric ret (\%) & $0.05^{**}$ & $0.09^{***}$ & $0.09^{***}$ & $0.10^{***}$ & $0.11^{***}$ & $0.11^{***}$ & $0.10^{***}$ & $0.09^{***}$ & $0.10^{***}$ & $0.11^{***}$ & $0.07$ \\ 
+   \vspace{5pt}1963 - 2023 &  & $(0.02)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.02)$ & $(0.02)$ & $(0.04)$ & $(0.04)$ \\ 
+   & Asymmetric ret (\%) & $0.07^{***}$ & $0.06^{***}$ & $0.05^{***}$ & $0.05^{***}$ & $0.05^{***}$ & $0.04^{***}$ & $0.03^{***}$ & $0.02^{***}$ & $-0.01$ & $-0.05^{*}$ & $-0.12^{***}$ \\ 
+   \vspace{5pt} &  & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.01)$ & $(0.03)$ & $(0.03)$ \\ 
+   \bottomrule 
+\end{tabular}
+
+\end{document}

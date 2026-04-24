@@ -1,0 +1,119 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[left=1cm,right=1cm,top=0.9cm,bottom=1.2cm]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage{booktabs}
+\usepackage{multirow}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+The stock base is: all
+
+\begin{tabular}{lcccccccc}
+  \hline \multicolumn{9}{c}{Dependent variable: next-month return ($r_{i,t}$, in \%)} \\
+ \cmidrule(l){2-9}  & \multicolumn{4}{c}{Full sample} & \multicolumn{4}{c}{Above 20\% NYSE size} \\
+ \cmidrule(l){2-5} \cmidrule(l){6-9}  \vspace{5pt} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) \\ 
+  CSM & $0.52^{***}$ & $0.46^{***}$ & $0.33^{***}$ & $0.41^{***}$ & $0.45^{***}$ & $0.41^{***}$ & $0.31^{***}$ & $0.37^{***}$ \\ 
+   & $(0.06)$ & $(0.05)$ & $(0.04)$ & $(0.03)$ & $(0.06)$ & $(0.05)$ & $(0.04)$ & $(0.03)$ \\ 
+  beta &  & $0.06$ & $0.05$ & $0.10^{**}$ &  & $0.01$ & $0.01$ & $0.06$ \\ 
+   &  & $(0.06)$ & $(0.06)$ & $(0.05)$ &  & $(0.06)$ & $(0.06)$ & $(0.04)$ \\ 
+  size &  & $0.27^{***}$ & $0.28^{***}$ & $0.26^{***}$ &  & $0.11^{*}$ & $0.12^{**}$ & $0.21^{***}$ \\ 
+   &  & $(0.07)$ & $(0.07)$ & $(0.05)$ &  & $(0.06)$ & $(0.06)$ & $(0.05)$ \\ 
+  bm &  & $0.11^{***}$ & $0.13^{***}$ & $0.13^{***}$ &  & $0.04$ & $0.06^{***}$ & $0.10^{***}$ \\ 
+   \vspace{5pt} &  & $(0.03)$ & $(0.02)$ & $(0.02)$ &  & $(0.03)$ & $(0.02)$ & $(0.02)$ \\ 
+  Industry FE & N & N & Y & Y & N & N & Y & Y \\ 
+   \vspace{5pt}Other characteristics & N & N & Y & Y & N & N & Y & Y \\ 
+  Obs & 2,964 & 2,964 & 2,964 & 2,964 & 1,354 & 1,354 & 1,354 & 1,354 \\ 
+  $R^2$ & $0.008$ & $0.048$ & $0.075$ & $0.105$ & $0.016$ & $0.064$ & $0.111$ & $0.152$ \\ 
+   \bottomrule\end{tabular}
+
+The stock base is: large
+
+\begin{tabular}{lcccccccc}
+  \hline \multicolumn{9}{c}{Dependent variable: next-month return ($r_{i,t}$, in \%)} \\
+ \cmidrule(l){2-9}  & \multicolumn{4}{c}{Full sample} & \multicolumn{4}{c}{Above 20\% NYSE size} \\
+ \cmidrule(l){2-5} \cmidrule(l){6-9}  \vspace{5pt} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) \\ 
+  CSM & $0.36^{***}$ & $0.33^{***}$ & $0.25^{***}$ & $0.29^{***}$ & $0.36^{***}$ & $0.33^{***}$ & $0.24^{***}$ & $0.29^{***}$ \\ 
+   & $(0.04)$ & $(0.04)$ & $(0.03)$ & $(0.02)$ & $(0.04)$ & $(0.03)$ & $(0.03)$ & $(0.02)$ \\ 
+  beta &  & $0.02$ & $0.01$ & $0.07$ &  & $0.02$ & $0.01$ & $0.07$ \\ 
+   &  & $(0.06)$ & $(0.06)$ & $(0.04)$ &  & $(0.06)$ & $(0.06)$ & $(0.04)$ \\ 
+  size &  & $0.17^{***}$ & $0.19^{***}$ & $0.21^{***}$ &  & $0.15^{**}$ & $0.16^{***}$ & $0.22^{***}$ \\ 
+   &  & $(0.06)$ & $(0.06)$ & $(0.05)$ &  & $(0.06)$ & $(0.06)$ & $(0.06)$ \\ 
+  bm &  & $0.04$ & $0.05^{**}$ & $0.09^{***}$ &  & $0.04$ & $0.06^{**}$ & $0.09^{***}$ \\ 
+   \vspace{5pt} &  & $(0.03)$ & $(0.02)$ & $(0.02)$ &  & $(0.03)$ & $(0.02)$ & $(0.02)$ \\ 
+  Industry FE & N & N & Y & Y & N & N & Y & Y \\ 
+   \vspace{5pt}Other characteristics & N & N & Y & Y & N & N & Y & Y \\ 
+  Obs & 1,348 & 1,348 & 1,348 & 1,348 & 1,321 & 1,321 & 1,321 & 1,321 \\ 
+  $R^2$ & $0.016$ & $0.065$ & $0.113$ & $0.153$ & $0.016$ & $0.065$ & $0.114$ & $0.155$ \\ 
+   \bottomrule\end{tabular}
+
+\end{document}

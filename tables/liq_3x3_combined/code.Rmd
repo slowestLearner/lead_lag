@@ -1,0 +1,139 @@
+---
+author: ""
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{float}
+   - \usepackage{natbib}
+   - \usepackage{booktabs}
+   - \usepackage{multirow}
+geometry: "left=1cm,right=1cm,top=0.9cm,bottom=1.2cm"
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    number_sections: true
+#bibliography: ref.bib
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE}
+rm(list = ls())
+options(xtable.comment = FALSE)
+library(reshape)
+library(data.table)
+library(dplyr)
+library(naniar)
+library(scales)
+library(tidyr)
+library(xtable)
+library(pracma)
+library(this.path)
+setwd(this.path::this.dir())
+
+# just choose combined for now
+data <- readRDS("../../tmp/portfolio_results/by_liquidity_3x3/by_minus_spread_demeaned_ret1/1m_ret_by_3x3_scaled_summarized.RDS") %>%
+  filter(var == "combined") %>%
+  filter(var_type != "total") %>%
+  select(-var) %>%
+  mutate(coef = 100 * mean_ret1, se = 100 * se_ret1) %>%
+  select(-mean_ret1, -se_ret1, -n) %>%
+  setDT()
+
+# order rows and columns
+data <- data %>%
+  mutate(row_idx = tidyr::replace_na(as.integer(target_liq_bin), 4)) %>%
+  mutate(col_idx = tidyr::replace_na(as.integer(source_liq_bin), 4)) %>%
+  mutate(col_idx = ifelse(var_type == "sym", col_idx, col_idx + 4)) %>%
+  setDT()
+
+# show sym | asy
+
+
+# add stars
+cuts <- abs(qnorm(c(.01, .05, .1) / 2))
+data[, abs_tstat := abs(coef / se)]
+data[, ss := ifelse(abs_tstat > cuts[1], 3, ifelse(abs_tstat > cuts[2], 2, ifelse(abs_tstat > cuts[3], 1, 0)))]
+data[, coef_lab := paste0("$", sprintf("%.2f", coef))]
+data[, ss_lab := sapply(data[, ss], function(x) {
+  ifelse(x > 0,
+    paste0("^{", strcat(rep("*", x)), "}$"),
+    "$"
+  )
+})]
+data[, coef_lab := paste0(coef_lab, ss_lab)]
+data[, ss_lab := NULL]
+
+est <- data %>%
+  dcast(row_idx ~ col_idx, value.var = "coef_lab") %>%
+  mutate(group_idx = 1, type = "coef")
+est[is.na(est)] <- ""
+
+se <- data %>%
+  dcast(row_idx ~ col_idx, value.var = "se") %>%
+  dplyr::mutate_at(vars(2:9), ~ paste0("$(", sprintf("%.2f", round(., 2)), ")$")) %>%
+  mutate(group_idx = 2, type = "se")
+se[se == "$(NA)$"] <- ""
+
+tbl <- rbind(est, se) %>%
+  arrange(row_idx, group_idx) %>%
+  select(-group_idx, -type)
+rm(est, se)
+
+# add col columns
+col_names <- data.table(t(as.data.frame(c("", paste0("(", 1:8, ")")))))
+names(col_names) <- names(tbl)
+tbl <- rbind(col_names, tbl)
+rm(col_names)
+
+# get labels right
+tbl[, row_idx := c("", "Low", "", "Med", "", "High", "", "High - Low", "")]
+
+# add another one
+tt <- as.data.table(t(data.table(c("", rep(c("Low", "Med", "High", "High - Low"), 2)))))
+names(tt) <- names(tbl)
+tbl <- rbind(tt, tbl)
+rm(tt)
+
+align_vector <- paste0("ll", paste0(rep("c", times = ncol(tbl) - 1), collapse = ""))
+x.side <- xtable(tbl, align = align_vector)
+
+this_add_to_row <- list(
+  pos = list(0, 1, nrow(tbl)-3, nrow(tbl)),
+  command = c(
+    "\\toprule \\ Lag firms & \\multicolumn{8}{c}{Lead firms} \\\\\n \\cmidrule(l){2-9} & \\multicolumn{4}{c}{Symmetric CSM} & \\multicolumn{4}{c}{Asymmetric CSM} \\\\\n \\cmidrule(l){2-5} \\cmidrule(l){2-9} ",
+    "\\cmidrule(l){2-4} \\cmidrule(l){5-5} \\cmidrule(l){6-8} \\cmidrule(l){9-9} \\vspace{5pt}",
+    "\\vspace{10pt}",
+    "\\bottomrule \n"
+  )
+)
+
+print(x.side,
+  type = "latex",
+  table.placement = "!ht",
+  include.rownames = FALSE,
+  include.colnames = FALSE,
+  tabular.environment = "tabular",
+  caption.placement = NULL, # "top", NULL
+  hline.after = NULL, # We don't need hline; we use booktabs
+  floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+  sanitize.text.function = force, # Important to treat content of first column as latex function
+  add.to.row = this_add_to_row
+)
+
+print(x.side,
+  type = "latex",
+  table.placement = "!ht",
+  include.rownames = FALSE,
+  include.colnames = FALSE,
+  tabular.environment = "tabular",
+  caption.placement = NULL, # "top", NULL
+  hline.after = NULL, # We don't need hline; we use booktabs
+  floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+  sanitize.text.function = force, # Important to treat content of first column as latex function
+  add.to.row = this_add_to_row,
+  file = "liq_3x3_combined.tex"
+)
+```

@@ -1,0 +1,162 @@
+---
+author: ""
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{float}
+   - \usepackage{natbib}
+   - \usepackage{booktabs}
+   - \usepackage{multirow}
+geometry: "left=1cm,right=1cm,top=0.9cm,bottom=1.2cm"
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    number_sections: true
+#bibliography: ref.bib
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE}
+rm(list = ls())
+options(xtable.comment = FALSE)
+library(reshape)
+library(data.table)
+library(dplyr)
+library(naniar)
+library(scales)
+library(tidyr)
+library(xtable)
+library(pracma)
+library(this.path)
+library(fs)
+setwd(this.path::this.dir())
+
+# regression results
+for (stock_base in c("all", "large")){
+  
+  data <- readRDS(paste0("../../tmp/other_methods/", stock_base, "/fama_macbeth/fm_results_summary.RDS")) %>%
+    filter(var == "combined") %>%
+    filter(reg_var %in% c("signal", "size", "beta", "size", "bm")) %>%
+    mutate(reg_var = ifelse(reg_var == "signal", "CSM", reg_var)) %>%
+    select(-var, -model_name) %>%
+    mutate(coef = 100 * coef, se = 100 * se)
+  
+  # order RHS vars
+  tmp <- unique(data[, .(reg_var)]) %>%
+    mutate(var_idx = row_number())
+  data <- merge(data, tmp, by = "reg_var")
+  rm(tmp)
+  
+  # order universe and reg specifications
+  tmp <- unique(data[, .(universe, spec_idx)]) %>%
+    arrange(universe, spec_idx) %>%
+    mutate(reg_idx = row_number())
+  data <- merge(data, tmp, by = c("universe", "spec_idx"))
+  rm(tmp)
+  
+  # add stars
+  cuts <- abs(qnorm(c(.01, .05, .1) / 2))
+  data[, abs_tstat := abs(coef / se)]
+  data[, ss := ifelse(abs_tstat > cuts[1], 3, ifelse(abs_tstat > cuts[2], 2, ifelse(abs_tstat > cuts[3], 1, 0)))]
+  data[, coef_lab := paste0("$", sprintf("%.2f", coef))]
+  data[, ss_lab := sapply(data[, ss], function(x) {
+    ifelse(x > 0,
+      paste0("^{", strcat(rep("*", x)), "}$"),
+      "$"
+    )
+  })]
+  data[, coef_lab := paste0(coef_lab, ss_lab)]
+  data[, ss_lab := NULL]
+  
+  est <- dcast(data, var_idx + reg_var ~ reg_idx, value.var = "coef_lab") %>%
+    dplyr::mutate(group_id = 100 * row_number(), type = "coef") %>%
+    select(-var_idx)
+  est[is.na(est)] <- ""
+  
+  se <- dcast(data, var_idx + reg_var ~ reg_idx, value.var = "se") %>%
+    dplyr::mutate(group_id = 100 * row_number() + 1, type = "se") %>%
+    select(-var_idx) %>%
+    dplyr::mutate_at(vars(2:9), ~ paste0("$(", sprintf("%.2f", round(., 2)), ")$"))
+  se[se == "$(NA)$"] <- ""
+  
+  tbl <- bind_rows(est, se)
+  rm(est, se)
+  
+  ctrls <- data.table(reg_var = "Industry FE", t(rep(c("N", "N", "Y", "Y"), 2)))
+  ctrls <- rbind(ctrls, data.table(reg_var = "Other characteristics", t(rep(c("N", "N", "Y", "Y"), 2))))
+  ctrls[, group_id := 1000 + 1:2]
+  ctrls[, type := ""]
+  names(ctrls) <- names(tbl)
+  tbl <- bind_rows(tbl, ctrls)
+  rm(ctrls)
+  
+  obs_and_r2 <- unique(data[, list(reg_idx, obs = n, r2)]) %>%
+    mutate(
+      obs = comma(obs),
+      r2 = paste0("$", sprintf("%.3f", r2), "$")
+    ) %>%
+    pivot_longer(., -reg_idx) %>%
+    pivot_wider(name, names_from = "reg_idx", values_from = "value") %>%
+    dplyr::mutate(name = replace(name, name == "r2", "$R^2$")) %>%
+    mutate(name = replace(name, name == "obs", "Obs")) %>%
+    dplyr::rename(reg_var = name) %>%
+    mutate(group_id = c(2001, 2002), type = "")
+  
+  tbl <- bind_rows(tbl, obs_and_r2) %>%
+    dplyr::arrange(group_id) %>%
+    mutate(reg_var = ifelse(type == "se", "", reg_var)) %>%
+    mutate(type = NULL, group_id = NULL)
+  
+  # add col columns
+  col_names <- data.table(t(as.data.frame(c("", paste0("(", 1:8, ")")))))
+  names(col_names) <- names(tbl)
+  tbl <- bind_rows(col_names, tbl)
+  rm(col_names)
+  
+  align_vactor <- paste0("ll", paste0(rep("c", times = ncol(tbl) - 1), collapse = ""))
+  x.side <- xtable(tbl, align = align_vactor)
+  
+  this_add_to_row <- list(
+    pos = list(-1, 0, nrow(tbl) - 5, nrow(tbl) - 3, nrow(tbl)),
+    command = c(
+      "\\hline \\multicolumn{9}{c}{Dependent variable: next-month return ($r_{i,t}$, in \\%)} \\\\\n \\cmidrule(l){2-9}",
+      "& \\multicolumn{4}{c}{Full sample} & \\multicolumn{4}{c}{Above 20\\% NYSE size} \\\\\n \\cmidrule(l){2-5} \\cmidrule(l){6-9}  \\vspace{5pt}",
+      rep("\\vspace{5pt}", 2),
+      "\\bottomrule"
+    )
+  )
+  
+  cat("The stock base is:", stock_base)
+  print(x.side,
+    type = "latex",
+    table.placement = "!ht",
+    include.rownames = FALSE,
+    include.colnames = FALSE,
+    tabular.environment = "tabular",
+    caption.placement = NULL, # "top", NULL
+    hline.after = NULL, # We don't need hline; we use booktabs
+    floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+    sanitize.text.function = force, # Important to treat content of first column as latex function
+    add.to.row = this_add_to_row,
+  )
+  out_dir <- paste0(stock_base, "/")
+  dir_create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  print(x.side,
+    type = "latex",
+    table.placement = "!ht",
+    include.rownames = FALSE,
+    include.colnames = FALSE,
+    tabular.environment = "tabular",
+    caption.placement = NULL, # "top", NULL
+    hline.after = NULL, # We don't need hline; we use booktabs
+    floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+    sanitize.text.function = force, # Important to treat content of first column as latex function
+    add.to.row = this_add_to_row,
+    file = paste0(stock_base, "/fm_reg_combined.tex")
+   )
+}
+
+
+```

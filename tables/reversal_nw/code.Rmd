@@ -1,0 +1,145 @@
+---
+author: ""
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{float}
+   - \usepackage{natbib}
+   - \usepackage{booktabs}
+   - \usepackage{multirow}
+geometry: "left=1cm,right=1cm,top=0.9cm,bottom=1.2cm"
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    number_sections: true
+#bibliography: ref.bib
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE}
+rm(list = ls())
+library(pandoc)
+options(xtable.comment = FALSE)
+library(reshape)
+library(data.table)
+library(dplyr)
+library(naniar)
+library(scales)
+library(tidyr)
+library(xtable)
+library(pracma)
+library(fs)
+# library(rstudioapi)
+library(this.path)
+
+# set working directory to be the root of the code
+setwd(this.path::this.dir())
+for (stock_base in c("all", "large")){
+  # regression results
+  data <- readRDS(paste0("../../tmp/portfolio_results/", stock_base,
+                         "/statistics/newey_west/remove_20pct_stk_FALSE.RDS")) %>%
+    filter(var_type == "total") %>%
+    filter(hor_idx %in% 1:5) %>%
+    filter(!grepl("combined_", var)) %>%
+    mutate(coef = 100 * coef, se = 100 * se, hor_lab = paste0(from_hor, " $\\rightarrow$ ", to_hor)) %>%
+    select(var, coef, se, hor_lab, hor_idx) %>%
+    setDT()
+  
+  # order the variables
+  tmp <- readRDS(paste0("../../tmp/processed_signals/", stock_base,
+                        "/signal_availability.RDS")) %>%
+    group_by(var, var_lab) %>%
+    summarize(first_ym = min(yyyymm), .groups = "drop") %>%
+    arrange(first_ym) %>%
+    setDT() %>%
+    mutate(var = gsub("_ret", "", var)) %>%
+    mutate(var = ifelse(var == "indu", "industry", ifelse(var == "tec", "tech", var))) %>%
+    bind_rows(., data.table(var = "combined", var_lab = "Combined predictor", first_ym = 0)) %>%
+    arrange(first_ym) %>%
+    mutate(var_idx = row_number()) %>%
+    select(-first_ym)
+  data <- merge(data, tmp, by = "var")
+  rm(tmp)
+  
+  # add stars
+  cuts <- abs(qnorm(c(.01, .05, .1) / 2))
+  data[, abs_tstat := abs(coef / se)]
+  data[, ss := ifelse(abs_tstat > cuts[1], 3, ifelse(abs_tstat > cuts[2], 2, ifelse(abs_tstat > cuts[3], 1, 0)))]
+  data[, coef_lab := paste0("$", sprintf("%.2f", coef))]
+  data[, ss_lab := sapply(data[, ss], function(x) {
+    ifelse(x > 0,
+      paste0("^{", strcat(rep("*", x)), "}$"),
+      "$"
+    )
+  })]
+  data[, coef_lab := paste0(coef_lab, ss_lab)]
+  data[, ss_lab := NULL]
+  
+  est <- cast(data[, list(var_idx, hor_idx, coef_lab)], var_idx ~ hor_idx)
+  est[is.na(est)] <- ""
+  
+  se <- cast(data[, list(var_idx, hor_idx, se)], var_idx ~ hor_idx) %>%
+    dplyr::mutate_at(vars(2:6), ~ paste0("$(", sprintf("%.2f", round(., 2)), ")$")) %>%
+    select(-var_idx)
+  
+  tbl <- data.table(bind_cols(est, se))
+  rm(est, se)
+  
+  # add col columns
+  col_names <- data.table(t(as.data.frame(c("", paste0("(", 1:10, ")")))))
+  names(col_names) <- names(tbl)
+  tbl <- rbind(col_names, tbl)
+  rm(col_names)
+  
+  # get labels right
+  tbl[, var_idx := c("", unique(data[, .(var_lab, var_idx)][order(var_idx)])[, var_lab])]
+  pp <- unique(data[, .(hor_idx, hor_lab)])[order(hor_idx)][, hor_lab]
+  tt <- data.table(t(as.data.frame(c("Horizon:", pp, pp))))
+  names(tt) <- names(tbl)
+  tbl <- rbind(tt, tbl)
+  rm(tt, pp)
+  
+  align_vector <- paste0("ll", paste0(rep("c", times = ncol(tbl) - 1), collapse = ""))
+  x.side <- xtable(tbl, align = align_vector)
+  
+  this_add_to_row <- list(
+    pos = list(0, 1, 1, 2, nrow(tbl)),
+    command = c(
+      "\\toprule & \\multicolumn{5}{c}{Cumulative returns (\\%)} & \\multicolumn{5}{c}{Standard error (\\%)} \\\\\n \\cmidrule(l){2-6} \\cmidrule(l){7-11}",
+      "\\cmidrule(l){2-6} \\cmidrule(l){7-11}",
+      rep("\\vspace{5pt}", 2),
+      "\\bottomrule \n"
+    )
+  )
+  cat("The stock base is:", stock_base)
+  print(x.side,
+    type = "latex",
+    table.placement = "!ht",
+    include.rownames = FALSE,
+    include.colnames = FALSE,
+    tabular.environment = "tabular",
+    caption.placement = NULL, # "top", NULL
+    hline.after = NULL, # We don't need hline; we use booktabs
+    floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+    sanitize.text.function = force, # Important to treat content of first column as latex function
+    add.to.row = this_add_to_row
+  )
+  out_dir <- paste0(stock_base, "/")
+  dir_create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  print(x.side,
+    type = "latex",
+    table.placement = "!ht",
+    include.rownames = FALSE,
+    include.colnames = FALSE,
+    tabular.environment = "tabular",
+    caption.placement = NULL, # "top", NULL
+    hline.after = NULL, # We don't need hline; we use booktabs
+    floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+    sanitize.text.function = force, # Important to treat content of first column as latex function
+    add.to.row = this_add_to_row,
+    file = paste0(stock_base, "/reversal_nw.tex")
+  )
+}
+```

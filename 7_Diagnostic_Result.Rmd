@@ -1,0 +1,87 @@
+---
+author: ""
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{float}
+   - \usepackage{natbib}
+   - \usepackage{booktabs}
+   - \usepackage{xcolor}
+geometry: "left=1cm,right=1cm,top=0.9cm,bottom=1.2cm"
+
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    number_sections: true
+bibliography: ref.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(rio)
+library(latex2exp)
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(lubridate)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(haven)
+library(tidyr)
+library(tidyverse)
+library(stargazer, quietly = TRUE)
+library(plm) 
+library(xtable)
+library(RColorBrewer)
+library(ggrepel)
+library(ggpmisc)
+library(scales)
+library(lmtest)
+t1 <- readRDS("output_table1.Rds")
+t2 <- readRDS("output_table2.Rds")
+plot_data <- readRDS("output_plot_sample.Rds")
+```
+
+This table validates the magnitude of the calculated ICCs. We compare our replicated Median ICC against the reported values in the original paper for select years.
+```{r table1, echo = FALSE, fig.cap="Figure", fig.topcaption=TRUE, results = 'asis', warning=FALSE, message=FALSE}
+display_years <- c(1985, 1990, 1995, 2000, 2005, 2008, 2010)
+t1_display <- t1[Year %in% display_years]
+
+# Formatting
+t1_display %>%
+  kable(caption = "Replication of Table 1 Panel A: Summary Statistics",
+        col.names = c("Year", "N Firms", "Median ICC (%)", "Q1 (%)", "Q3 (%)", "Std Dev", "Paper Target (%)"),
+        digits = 1,
+        booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position")) %>%
+  column_spec(7, bold = TRUE, color = "blue") # Highlight the target column
+```
+
+We regress Cash Flow News (CF) and Discount Rate News (DR) on realized returns at various horizons (k)
+\[\beta_{CF} = \frac{Cov(CF_k, Ret_k)}{Var(Ret_k)}\]
+As the horizon k increases, cash flows should explain a larger proportion of return variation.
+```{r table2, echo = FALSE, fig.cap="Figure", fig.topcaption=TRUE, results = 'asis', warning=FALSE, message=FALSE}
+t2 %>%
+  dplyr::select(-Obs) %>%
+  kable(caption = "Replication of Table 2 Panel B: Variance Decomposition",
+        col.names = c("Horizon (Months)", "Beta CF (Our Result)", "Beta DR", "Paper Target (Beta CF)"),
+        digits = 3,
+        booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position")) %>%
+  column_spec(2, bold = TRUE) %>%
+  column_spec(4, bold = TRUE, color = "blue")
+```
+
+```{r table3, echo = FALSE, fig.cap="Figure", fig.topcaption=TRUE, results = 'asis', warning=FALSE, message=FALSE, fig.width = 6, fig.height = 3}
+ggplot(plot_data, aes(x = Ret_12m, y = CF_12m)) +
+  geom_point(alpha = 0.1, color = "darkblue", size = 0.8) +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black") +
+  labs(title = "1-Year Horizon: Returns vs. Cash Flow News",
+       subtitle = "Red Line = Regression Fit | Dashed Line = 45 Degree (Perfect Match)",
+       x = "Realized Return (12 Months)",
+       y = "Cash Flow News (12 Months)") +
+  theme_minimal() +
+  coord_cartesian(xlim = c(-1, 1), ylim = c(-1, 1)) # Zoom in on the core data
+```
