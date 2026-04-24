@@ -1,0 +1,35 @@
+# Mac files
+.DS_Store
+
+# RStudio files
+.Rapp.history
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# everything in tmp
+tmp/
+
+# output logs
+*.log
+
+# obsidian files
+.obsidian/
+
+# renv library - this is important!
+# The lockfile is tracked, not the library source code.
+renv/library/
+
+# Outputs and temporary files
+*.html
+*.pdf
+*.png
+*.jpeg
+*.jpg
+figs/
+tmp/
+
+# Large data files - track small data, but not large raw files
+*.RDS
+*.csv
