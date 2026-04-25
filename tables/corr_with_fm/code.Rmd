@@ -36,10 +36,10 @@ library(fs)
 setwd(this.path::this.dir())
 
 
-for (stock_base in c("all", "large")){
+for (stock_base in c("all", "large")) {
   # get correlations
   data <- readRDS(paste0("../../tmp/sym/", stock_base, "/summaries/cor_with_fm.RDS"))
-  
+
   # rank the variables
   tmp <- readRDS(paste0("../../tmp/processed_signals/", stock_base, "/signal_availability.RDS")) %>%
     group_by(var, var_lab) %>%
@@ -58,15 +58,15 @@ for (stock_base in c("all", "large")){
       ifelse(var == "tec", "tech", var)
     )) %>%
     setDT()
-  
+
   data <- merge(data, tmp, by = "var")
   rm(tmp)
-  
+
   # get sample sizes
   sample_size <- data[, .(var_lab, obs)] %>%
     unique() %>%
     mutate(obs = comma(obs))
-  
+
   # put into table format
   data <- data %>%
     mutate(cor_with_fm = sprintf("%.1f", 100 * cor_with_fm)) %>%
@@ -78,16 +78,16 @@ for (stock_base in c("all", "large")){
     setDT() %>%
     setcolorder(c("var_lab", "obs", "total", "sym", "asy"))
   rm(sample_size)
-  
+
   # add col columns
   col_names <- data.table(t(as.data.frame(c("", paste0("(", 1:(ncol(data) - 1), ")")))))
   names(col_names) <- names(data)
   data <- rbind(col_names, data)
   rm(col_names)
-  
+
   align_vector <- paste0("ll", paste0(rep("r", times = ncol(data) - 1), collapse = ""))
   x.side <- xtable(data, align = align_vector)
-  
+
   this_add_to_row <- list(
     pos = list(-1, -1, -1, 3, nrow(data)),
     command = c(
@@ -106,7 +106,7 @@ for (stock_base in c("all", "large")){
     sanitize.text.function = force, # Important to treat content of first column as latex function
     add.to.row = this_add_to_row
   )
-  
+
   out_dir <- paste0(stock_base, "/")
   dir_create(out_dir, showWarnings = FALSE, recursive = TRUE)
   print(x.side,
@@ -119,5 +119,19 @@ for (stock_base in c("all", "large")){
     add.to.row = this_add_to_row,
     file = paste0(stock_base, "/cor_with_fm.tex")
   )
+
+  # # Define the path for the tex file
+  # tex_file <- paste0(stock_base, "/cor_with_fm.tex")
+
+  # # Create a standalone PDF from the tex snippet
+  # # This wraps the table in a basic LaTeX document and compiles it
+  # tinytex::latexmk(
+  #   file = tex_file,
+  #   engine = "pdflatex",
+  #   install_packages = FALSE,
+  #   emulate_gui = FALSE,
+  #   # This 'template' wrapper is necessary because .tex from xtable is just a fragment
+  #   args = c("-jobname=cor_with_fm", "-output-directory", out_dir)
+  # )
 }
 ```

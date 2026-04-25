@@ -5,7 +5,7 @@ setwd(this.path::this.dir())
 
 # different specifications
 for (stock_base in c("all", "large")) {
-  # stock_base <- 'all'
+  # stock_base <- 'large'
   print(stock_base)
 
   from_dir_base <- paste0("tmp/portfolio_results/", stock_base, "/scale_by_total/")
@@ -30,16 +30,6 @@ for (stock_base in c("all", "large")) {
   # Long-short portfolio returns
   data <- readRDS(paste0(from_dir_base, "/returns.RDS"))
 
-  # # Create a combined version - TODO: already have a combined version!
-  # data_combined <- data[
-  #   , .(
-  #     var = "combined", ret_fut = mean(ret_fut),
-  #     sum_w_pos = mean(sum_w_pos),
-  #     sum_w_neg = mean(sum_w_neg)
-  #   ),
-  #   .(yyyymm, hor, weight_type, var_type, factor_model)
-  # ]
-
   # Create subsamples for the combined version
   data_combined <- data[var == "combined"]
   data_combined_first <- data_combined %>%
@@ -51,6 +41,7 @@ for (stock_base in c("all", "large")) {
   data <- rbind(data, data_combined_first, data_combined_second)
   rm(data_combined, data_combined_first, data_combined_second)
   gc()
+
   # compute cumulative returns by vintage
   tmp <- unique(data[, .(var, weight_type, var_type, factor_model)]) %>% mutate(spec_idx = row_number())
   data <- merge(data, tmp, by = c("var", "weight_type", "var_type", "factor_model")) %>%
@@ -66,14 +57,10 @@ for (stock_base in c("all", "large")) {
   data <- rbind(data_initial, data)
   rm(data_initial)
 
-  # for (this_spec in spec_data[, spec_dir]) {
   # loop over horizons
   out_all <- data.table()
   for (this_hor_idx in hor_data[, hor_idx]) {
     tic(paste0("hor_idx = ", this_hor_idx))
-
-    # this_hor_idx <- 1
-    # print(this_hor_idx)
 
     # parse
     this_from_hor <- hor_data[hor_idx == this_hor_idx, from_hor]
@@ -124,22 +111,6 @@ for (stock_base in c("all", "large")) {
     out_all <- rbind(out_all, out)
     toc()
   }
-  # out_all[, spec := this_spec]
+
   saveRDS(out_all, paste0(to_dir, "scale_by_total.RDS"))
-  # }
 }
-
-# # --- sanity: compare with earlier
-# # source('runmefirst.R')
-
-# data_new <- readRDS("tmp/portfolio_results/all/statistics/newey_west/scale_by_total.RDS")
-# data_old <- readRDS("tmp/portfolio_results/all/statistics/newey_west/remove_20pct_stk_FALSE.RDS")[, spec := NULL]
-# dim(data_new) == dim(data_old)
-# data <- merge(data_new, data_old, by = c("var", "weight_type", "var_type", "factor_model", "hor_idx", "from_hor", "to_hor"))
-# nrow(data) == nrow(data_new)
-
-# # a few have changed
-# data[, cor(coef.x, coef.y), var]
-# data[var == "combined" & hor_idx %in% 1:3, .(var_type, hor_idx, from_hor, to_hor, coef.x, coef.y)]
-# data[var == "combined_1926_1962" & hor_idx %in% 1:3, .(var_type, hor_idx, from_hor, to_hor, coef.x, coef.y)]
-# data[var == "combined_1963_2023" & hor_idx %in% 1:3, .(var_type, hor_idx, from_hor, to_hor, coef.x, coef.y)]

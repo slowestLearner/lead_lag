@@ -1,10 +1,12 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-%
 \documentclass[
 ]{article}
+\usepackage{xcolor}
+\usepackage[left=1cm,right=1cm,top=0.9cm,bottom=1.2cm]{geometry}
 \usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
@@ -35,36 +37,32 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage{xcolor}
-\usepackage[left=1cm,right=1cm,top=0.9cm,bottom=1.2cm]{geometry}
 \usepackage{graphicx}
 \makeatletter
-\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
-\makeatother
-% Scale images if necessary, so that they will not overflow the page
-% margins by default, and it is still possible to overwrite the defaults
-% using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
 % Set default figure placement to htbp
-\makeatletter
 \def\fps@figure{htbp}
 \makeatother
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{5}
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
 \usepackage{rotating}
 \usepackage{float}
 \usepackage{natbib}
 \usepackage{booktabs}
 \usepackage{multirow}
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\usepackage[]{natbib}
-\bibliographystyle{plainnat}
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
@@ -82,7 +80,7 @@ The stock base is: all
    \toprule & \multicolumn{5}{c}{Cumulative returns (\%)} & \multicolumn{5}{c}{Standard error (\%)} \\
  \cmidrule(l){2-6} \cmidrule(l){7-11}Horizon: & 1 $\rightarrow$ 1 & 1 $\rightarrow$ 12 & 13 $\rightarrow$ 60 & 13 $\rightarrow$ 84 & 13 $\rightarrow$ 120 & 1 $\rightarrow$ 1 & 1 $\rightarrow$ 12 & 13 $\rightarrow$ 60 & 13 $\rightarrow$ 84 & 13 $\rightarrow$ 120 \\ 
    \cmidrule(l){2-6} \cmidrule(l){7-11} \vspace{5pt} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) & (9) & (10) \\ 
-   \vspace{5pt}Combined predictor & $0.76^{***}$ & $2.70^{***}$ & $-1.45$ & $-2.02^{**}$ & $-3.63^{***}$ & $(0.08)$ & $(0.37)$ & $(0.94)$ & $(0.96)$ & $(1.03)$ \\ 
+   \vspace{5pt}Combined predictor & $1.08^{***}$ & $4.14^{***}$ & $-1.30$ & $-2.28^{*}$ & $-4.46^{***}$ & $(0.11)$ & $(0.58)$ & $(1.26)$ & $(1.25)$ & $(1.19)$ \\ 
   Industry momentum & $0.90^{***}$ & $3.09^{***}$ & $-1.08$ & $-1.87^{*}$ & $-3.67^{***}$ & $(0.09)$ & $(0.44)$ & $(1.02)$ & $(1.03)$ & $(1.10)$ \\ 
   BEA customer & $0.92^{***}$ & $3.93^{***}$ & $0.40$ & $-0.51$ & $-3.14^{***}$ & $(0.11)$ & $(0.57)$ & $(1.27)$ & $(1.43)$ & $(1.20)$ \\ 
   BEA supplier & $0.80^{***}$ & $3.39^{***}$ & $-0.04$ & $-1.56$ & $-3.12^{**}$ & $(0.11)$ & $(0.60)$ & $(1.11)$ & $(1.26)$ & $(1.32)$ \\ 
@@ -100,7 +98,7 @@ The stock base is: large
    \toprule & \multicolumn{5}{c}{Cumulative returns (\%)} & \multicolumn{5}{c}{Standard error (\%)} \\
  \cmidrule(l){2-6} \cmidrule(l){7-11}Horizon: & 1 $\rightarrow$ 1 & 1 $\rightarrow$ 12 & 13 $\rightarrow$ 60 & 13 $\rightarrow$ 84 & 13 $\rightarrow$ 120 & 1 $\rightarrow$ 1 & 1 $\rightarrow$ 12 & 13 $\rightarrow$ 60 & 13 $\rightarrow$ 84 & 13 $\rightarrow$ 120 \\ 
    \cmidrule(l){2-6} \cmidrule(l){7-11} \vspace{5pt} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) & (9) & (10) \\ 
-   \vspace{5pt}Combined predictor & $0.68^{***}$ & $1.97^{***}$ & $-1.68^{*}$ & $-2.10^{**}$ & $-3.72^{***}$ & $(0.09)$ & $(0.36)$ & $(0.93)$ & $(0.97)$ & $(1.12)$ \\ 
+   \vspace{5pt}Combined predictor & $0.94^{***}$ & $2.84^{***}$ & $-1.84$ & $-2.57^{**}$ & $-4.73^{***}$ & $(0.12)$ & $(0.54)$ & $(1.25)$ & $(1.30)$ & $(1.44)$ \\ 
   Industry momentum & $0.78^{***}$ & $2.10^{***}$ & $-1.42$ & $-2.07^{**}$ & $-3.96^{***}$ & $(0.10)$ & $(0.40)$ & $(0.96)$ & $(0.99)$ & $(1.18)$ \\ 
   BEA customer & $0.69^{***}$ & $2.61^{***}$ & $-0.31$ & $-1.28$ & $-3.96^{***}$ & $(0.11)$ & $(0.50)$ & $(1.30)$ & $(1.43)$ & $(1.33)$ \\ 
   BEA supplier & $0.58^{***}$ & $2.00^{***}$ & $-0.97$ & $-2.09^{*}$ & $-3.63^{***}$ & $(0.11)$ & $(0.47)$ & $(1.05)$ & $(1.19)$ & $(1.32)$ \\ 

@@ -1,10 +1,12 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-%
 \documentclass[
 ]{article}
+\usepackage{xcolor}
+\usepackage[left=1cm,right=1cm,top=0.9cm,bottom=1.2cm]{geometry}
 \usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
@@ -35,36 +37,32 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage{xcolor}
-\usepackage[left=1cm,right=1cm,top=0.9cm,bottom=1.2cm]{geometry}
 \usepackage{graphicx}
 \makeatletter
-\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
-\makeatother
-% Scale images if necessary, so that they will not overflow the page
-% margins by default, and it is still possible to overwrite the defaults
-% using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
 % Set default figure placement to htbp
-\makeatletter
 \def\fps@figure{htbp}
 \makeatother
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{5}
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
 \usepackage{rotating}
 \usepackage{float}
 \usepackage{natbib}
 \usepackage{booktabs}
 \usepackage{multirow}
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\usepackage[]{natbib}
-\bibliographystyle{plainnat}
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
@@ -81,24 +79,24 @@ The stock base is: all
 \begin{tabular}{lcccccc}
   \hline \multicolumn{7}{c}{Dependent variable: combined CSM portfolio return} \\
  \cmidrule(l){2-7} \vspace{5pt}  & (1) & (2) & (3) & (4) & (5) & (6) \\ 
-  ALPHA & $0.47^{***}$ & $0.51^{***}$ & $0.51^{***}$ & $0.49^{***}$ & $0.40^{***}$ & $0.71^{***}$ \\ 
-   & $(0.10)$ & $(0.10)$ & $(0.10)$ & $(0.10)$ & $(0.10)$ & $(0.07)$ \\ 
-  MKT &  & $-0.07^{***}$ & $-0.08^{***}$ & $-0.05^{**}$ & $-0.03$ & $0.07^{***}$ \\ 
-   &  & $(0.02)$ & $(0.02)$ & $(0.02)$ & $(0.02)$ & $(0.02)$ \\ 
-  SMB &  &  & $0.04$ & $0.01$ & $0.01$ & $0.07^{***}$ \\ 
-   &  &  & $(0.03)$ & $(0.04)$ & $(0.03)$ & $(0.02)$ \\ 
-  HML &  &  & $-0.01$ & $-0.14^{***}$ & $-0.08^{*}$ & $-0.01$ \\ 
-   &  &  & $(0.03)$ & $(0.04)$ & $(0.04)$ & $(0.03)$ \\ 
-  RMW &  &  &  & $-0.10^{**}$ & $-0.12^{***}$ & $-0.11^{***}$ \\ 
-   &  &  &  & $(0.05)$ & $(0.05)$ & $(0.03)$ \\ 
-  CMA &  &  &  & $0.28^{***}$ & $0.24^{***}$ & $0.13^{***}$ \\ 
-   &  &  &  & $(0.07)$ & $(0.07)$ & $(0.05)$ \\ 
-  MOM &  &  &  &  & $0.12^{***}$ & $0.00$ \\ 
-   &  &  &  &  & $(0.02)$ & $(0.02)$ \\ 
-  REV &  &  &  &  &  & $-0.64^{***}$ \\ 
-   \vspace{5pt} &  &  &  &  &  & $(0.02)$ \\ 
+  ALPHA & $0.97^{***}$ & $1.04^{***}$ & $1.04^{***}$ & $0.98^{***}$ & $0.83^{***}$ & $1.33^{***}$ \\ 
+   & $(0.16)$ & $(0.16)$ & $(0.16)$ & $(0.16)$ & $(0.16)$ & $(0.11)$ \\ 
+  MKT &  & $-0.12^{***}$ & $-0.13^{***}$ & $-0.08^{**}$ & $-0.05$ & $0.11^{***}$ \\ 
+   &  & $(0.03)$ & $(0.04)$ & $(0.04)$ & $(0.04)$ & $(0.03)$ \\ 
+  SMB &  &  & $0.05$ & $0.03$ & $0.02$ & $0.12^{***}$ \\ 
+   &  &  & $(0.05)$ & $(0.06)$ & $(0.06)$ & $(0.04)$ \\ 
+  HML &  &  & $-0.01$ & $-0.23^{***}$ & $-0.13^{*}$ & $-0.02$ \\ 
+   &  &  & $(0.05)$ & $(0.07)$ & $(0.07)$ & $(0.05)$ \\ 
+  RMW &  &  &  & $-0.11$ & $-0.15^{**}$ & $-0.14^{***}$ \\ 
+   &  &  &  & $(0.08)$ & $(0.07)$ & $(0.05)$ \\ 
+  CMA &  &  &  & $0.49^{***}$ & $0.42^{***}$ & $0.24^{***}$ \\ 
+   &  &  &  & $(0.11)$ & $(0.11)$ & $(0.07)$ \\ 
+  MOM &  &  &  &  & $0.21^{***}$ & $0.02$ \\ 
+   &  &  &  &  & $(0.04)$ & $(0.03)$ \\ 
+  REV &  &  &  &  &  & $-1.03^{***}$ \\ 
+   \vspace{5pt} &  &  &  &  &  & $(0.04)$ \\ 
   Obs & 726 & 726 & 726 & 726 & 726 & 726 \\ 
-  $R^2$ & $0.000$ & $0.013$ & $0.012$ & $0.044$ & $0.080$ & $0.573$ \\ 
+  $R^2$ & $0.000$ & $0.014$ & $0.013$ & $0.044$ & $0.084$ & $0.576$ \\ 
    \bottomrule\end{tabular}
 
 The stock base is: large
@@ -106,24 +104,24 @@ The stock base is: large
 \begin{tabular}{lcccccc}
   \hline \multicolumn{7}{c}{Dependent variable: combined CSM portfolio return} \\
  \cmidrule(l){2-7} \vspace{5pt}  & (1) & (2) & (3) & (4) & (5) & (6) \\ 
-  ALPHA & $0.31^{***}$ & $0.36^{***}$ & $0.36^{***}$ & $0.35^{***}$ & $0.27^{**}$ & $0.63^{***}$ \\ 
-   & $(0.10)$ & $(0.10)$ & $(0.10)$ & $(0.11)$ & $(0.11)$ & $(0.06)$ \\ 
-  MKT &  & $-0.09^{***}$ & $-0.10^{***}$ & $-0.08^{***}$ & $-0.06^{**}$ & $0.06^{***}$ \\ 
-   &  & $(0.02)$ & $(0.02)$ & $(0.03)$ & $(0.03)$ & $(0.02)$ \\ 
-  SMB &  &  & $0.01$ & $-0.01$ & $-0.01$ & $0.06^{***}$ \\ 
-   &  &  & $(0.04)$ & $(0.04)$ & $(0.04)$ & $(0.02)$ \\ 
-  HML &  &  & $-0.02$ & $-0.12^{**}$ & $-0.06$ & $0.02$ \\ 
-   &  &  & $(0.04)$ & $(0.05)$ & $(0.05)$ & $(0.03)$ \\ 
-  RMW &  &  &  & $-0.08$ & $-0.10^{*}$ & $-0.09^{***}$ \\ 
-   &  &  &  & $(0.05)$ & $(0.05)$ & $(0.03)$ \\ 
-  CMA &  &  &  & $0.22^{***}$ & $0.18^{**}$ & $0.04$ \\ 
-   &  &  &  & $(0.07)$ & $(0.07)$ & $(0.04)$ \\ 
-  MOM &  &  &  &  & $0.12^{***}$ & $-0.02$ \\ 
-   &  &  &  &  & $(0.02)$ & $(0.02)$ \\ 
-  REV &  &  &  &  &  & $-0.75^{***}$ \\ 
-   \vspace{5pt} &  &  &  &  &  & $(0.02)$ \\ 
+  ALPHA & $0.70^{***}$ & $0.79^{***}$ & $0.80^{***}$ & $0.74^{***}$ & $0.61^{***}$ & $1.18^{***}$ \\ 
+   & $(0.16)$ & $(0.16)$ & $(0.16)$ & $(0.17)$ & $(0.17)$ & $(0.10)$ \\ 
+  MKT &  & $-0.16^{***}$ & $-0.16^{***}$ & $-0.13^{***}$ & $-0.10^{**}$ & $0.09^{***}$ \\ 
+   &  & $(0.04)$ & $(0.04)$ & $(0.04)$ & $(0.04)$ & $(0.02)$ \\ 
+  SMB &  &  & $0.02$ & $0.01$ & $0.00$ & $0.12^{***}$ \\ 
+   &  &  & $(0.06)$ & $(0.06)$ & $(0.06)$ & $(0.04)$ \\ 
+  HML &  &  & $-0.02$ & $-0.19^{**}$ & $-0.09$ & $0.03$ \\ 
+   &  &  & $(0.06)$ & $(0.07)$ & $(0.08)$ & $(0.05)$ \\ 
+  RMW &  &  &  & $-0.06$ & $-0.10$ & $-0.08^{*}$ \\ 
+   &  &  &  & $(0.08)$ & $(0.08)$ & $(0.05)$ \\ 
+  CMA &  &  &  & $0.38^{***}$ & $0.31^{***}$ & $0.10$ \\ 
+   &  &  &  & $(0.11)$ & $(0.11)$ & $(0.07)$ \\ 
+  MOM &  &  &  &  & $0.19^{***}$ & $-0.03$ \\ 
+   &  &  &  &  & $(0.04)$ & $(0.02)$ \\ 
+  REV &  &  &  &  &  & $-1.19^{***}$ \\ 
+   \vspace{5pt} &  &  &  &  &  & $(0.03)$ \\ 
   Obs & 726 & 726 & 726 & 726 & 726 & 726 \\ 
-  $R^2$ & $0.000$ & $0.021$ & $0.019$ & $0.034$ & $0.063$ & $0.659$ \\ 
+  $R^2$ & $0.000$ & $0.025$ & $0.022$ & $0.037$ & $0.068$ & $0.667$ \\ 
    \bottomrule\end{tabular}
 
 \end{document}

@@ -1,10 +1,12 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-%
 \documentclass[
 ]{article}
+\usepackage{xcolor}
+\usepackage[left=1cm,right=1cm,top=0.9cm,bottom=1.2cm]{geometry}
 \usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
@@ -35,36 +37,32 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage{xcolor}
-\usepackage[left=1cm,right=1cm,top=0.9cm,bottom=1.2cm]{geometry}
 \usepackage{graphicx}
 \makeatletter
-\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
-\makeatother
-% Scale images if necessary, so that they will not overflow the page
-% margins by default, and it is still possible to overwrite the defaults
-% using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
 % Set default figure placement to htbp
-\makeatletter
 \def\fps@figure{htbp}
 \makeatother
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{5}
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
 \usepackage{rotating}
 \usepackage{float}
 \usepackage{natbib}
 \usepackage{booktabs}
 \usepackage{multirow}
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\usepackage[]{natbib}
-\bibliographystyle{plainnat}
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
@@ -82,17 +80,17 @@ The stock base is: all
   \toprule \multirow{2}{*}{Predictor} & \multirow{2}{*}{Obs} & \multicolumn{3}{c}{Correlation with FM} \\
  \cmidrule(l){3-5} & & CSM & Symmetric & Asymmetric \\
  \cmidrule(l){2-5} \vspace{5pt}  & (1) & (2) & (3) & (4) \\ 
-  Combined (full sample) & 1,175 & $62.8\%$ & $65.8\%$ & $2.0\%$ \\ 
-  Combined (1926-1962) & 443 & $61.9\%$ & $65.1\%$ & $10.4\%$ \\ 
-   \vspace{5pt}Combined (1963-2023) & 732 & $64.0\%$ & $67.4\%$ & $-9.2\%$ \\ 
-  Industry momentum & 1,175 & $57.9\%$ & $62.7\%$ & $-2.3\%$ \\ 
-  BEA customer & 853 & $58.7\%$ & $64.2\%$ & $-6.1\%$ \\ 
-  BEA supplier & 853 & $51.7\%$ & $60.2\%$ & $-7.2\%$ \\ 
-  Technology link & 576 & $45.4\%$ & $45.8\%$ & $-1.7\%$ \\ 
-  Geographic link & 660 & $25.1\%$ & $25.7\%$ & $-1.6\%$ \\ 
-  Complicated firms & 504 & $56.9\%$ & $60.8\%$ & $5.2\%$ \\ 
-  Economic link & 559 & $34.6\%$ & $42.7\%$ & $-1.2\%$ \\ 
-  Analyst coverage & 481 & $68.9\%$ & $69.8\%$ & $-10.8\%$ \\ 
+  Combined (full sample) & 1,175 & $60.5\%$ & $62.4\%$ & $-2.2\%$ \\ 
+  Combined (1926-1962) & 443 & $61.7\%$ & $64.1\%$ & $9.2\%$ \\ 
+   \vspace{5pt}Combined (1963-2023) & 732 & $64.2\%$ & $67.1\%$ & $-12.1\%$ \\ 
+  Industry momentum & 1,175 & $57.9\%$ & $60.8\%$ & $-4.8\%$ \\ 
+  BEA customer & 853 & $58.7\%$ & $62.5\%$ & $-8.9\%$ \\ 
+  BEA supplier & 853 & $51.7\%$ & $58.5\%$ & $-11.0\%$ \\ 
+  Technology link & 576 & $45.4\%$ & $46.2\%$ & $-2.5\%$ \\ 
+  Geographic link & 660 & $25.1\%$ & $25.5\%$ & $-2.3\%$ \\ 
+  Complicated firms & 504 & $57.0\%$ & $61.7\%$ & $3.8\%$ \\ 
+  Economic link & 559 & $34.6\%$ & $42.2\%$ & $-0.7\%$ \\ 
+  Analyst coverage & 481 & $68.9\%$ & $69.2\%$ & $-9.9\%$ \\ 
    \bottomrule\end{tabular}
 
 The stock base is: large
@@ -101,17 +99,17 @@ The stock base is: large
   \toprule \multirow{2}{*}{Predictor} & \multirow{2}{*}{Obs} & \multicolumn{3}{c}{Correlation with FM} \\
  \cmidrule(l){3-5} & & CSM & Symmetric & Asymmetric \\
  \cmidrule(l){2-5} \vspace{5pt}  & (1) & (2) & (3) & (4) \\ 
-  Combined (full sample) & 1,175 & $70.5\%$ & $72.0\%$ & $11.3\%$ \\ 
-  Combined (1926-1962) & 443 & $69.7\%$ & $71.0\%$ & $22.5\%$ \\ 
-   \vspace{5pt}Combined (1963-2023) & 732 & $72.0\%$ & $74.2\%$ & $-7.3\%$ \\ 
-  Industry momentum & 1,175 & $68.3\%$ & $70.4\%$ & $3.8\%$ \\ 
-  BEA customer & 853 & $68.2\%$ & $72.0\%$ & $-7.6\%$ \\ 
-  BEA supplier & 853 & $62.5\%$ & $68.4\%$ & $-6.5\%$ \\ 
-  Technology link & 576 & $57.3\%$ & $57.4\%$ & $1.1\%$ \\ 
-  Geographic link & 660 & $32.3\%$ & $32.4\%$ & $2.1\%$ \\ 
-  Complicated firms & 504 & $72.4\%$ & $73.6\%$ & $13.4\%$ \\ 
-  Economic link & 559 & $38.6\%$ & $48.4\%$ & $-2.4\%$ \\ 
-  Analyst coverage & 481 & $73.8\%$ & $74.4\%$ & $-8.5\%$ \\ 
+  Combined (full sample) & 1,175 & $68.1\%$ & $68.3\%$ & $3.4\%$ \\ 
+  Combined (1926-1962) & 443 & $69.5\%$ & $70.3\%$ & $16.9\%$ \\ 
+   \vspace{5pt}Combined (1963-2023) & 732 & $72.4\%$ & $73.7\%$ & $-11.6\%$ \\ 
+  Industry momentum & 1,175 & $68.3\%$ & $69.5\%$ & $-0.8\%$ \\ 
+  BEA customer & 853 & $68.2\%$ & $71.5\%$ & $-9.8\%$ \\ 
+  BEA supplier & 853 & $62.5\%$ & $67.9\%$ & $-8.9\%$ \\ 
+  Technology link & 576 & $57.3\%$ & $57.7\%$ & $-1.2\%$ \\ 
+  Geographic link & 660 & $32.3\%$ & $33.3\%$ & $-0.1\%$ \\ 
+  Complicated firms & 504 & $72.4\%$ & $73.1\%$ & $13.0\%$ \\ 
+  Economic link & 559 & $38.6\%$ & $47.7\%$ & $-2.6\%$ \\ 
+  Analyst coverage & 481 & $73.8\%$ & $73.9\%$ & $-8.4\%$ \\ 
    \bottomrule\end{tabular}
 
 \end{document}

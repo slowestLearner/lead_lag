@@ -24,7 +24,7 @@ Skip 4b and 4c, go to 6a
 - `2c1_reversals_tstats_only_total_different_specs.R`: Computes Newey-West alphas and standard errors for cumulative total-signal returns by specification.
 	- Great, no problem
 - `2c2_reversals_tstats_nw_include_sym_asy.R`: Computes Newey-West statistics for cumulative symmetric/asymmetric/total return series over selected horizons.
-	- Great, no problem
+	- Mostly right, but results have changed a bit... the combined CSM return is stronger, especially in its second part. One possibility is that the earlier version ignored the fact that "combined" is already available and then computed it again by averaging over all
 - `2d_reversals_tstats_nw_fraction_cov.R`: Estimates covariance structures needed to decompose symmetric/asymmetric shares of total reversal returns.
 	- would be good to also combine with the earlier scripts (e.g. 2c2?)
 	- Hmm, for combined, the variation has changed a lot. I think the issue may have been upstream. No idea how to deal with it
@@ -46,11 +46,15 @@ Skip 4b and 4c, go to 6a
 	- QUESTION: this involved "scaling again". Why? 
 - `4c_by_liquidity_3x3_produce_table.R`: (TOSKIP) Summarizes scaled 3x3 liquidity return panels into table-ready means and standard errors.
 	- QUESTION: I don't think the results here are right. It is true that higher liquidity source stock means more profits, but there is no clear difference by target liquidity
-- `5a_download_factors.R`: Downloads and harmonizes Fama-French factors (plus momentum and reversal) into a local factor file.
+- `5a_download_factors.R`: Downloads Fama-French factors into a local factor file. 
+	- done. 
 - `5b_other_methods_spanning.R`: Runs time-series spanning regressions of CSM returns on FF factor sets to test whether alpha survives controls.
+	- done. 
 - `5c_other_methods_fama_macbeth.R`: Estimates cross-sectional return predictability with Fama-MacBeth regressions under progressively richer controls.
+	- done
 - `6a_liquidity_half_half.R`: Main fast implementation for constructing liquidity-conditioned signal decomposition outputs from matrix data.
-- `6a_liquidity_half_half_slow_version_backup.R`: Slower backup implementation of the liquidity-conditioned matrix processing pipeline.
+	- DID NOT rerun. I ran out of memory. 
+	- The code really should be broken up into scripts? TODO
 - `7_debug_cf_dr.R`: Sandbox script with replication/debug checks for ICC summary stats and CF/DR decomposition diagnostics.
 - `7_diagnostic_cf_dr.R`: Produces diagnostic validation tables/plots for ICC and CF-vs-DR news decomposition behavior across horizons.
 - `7a1_solve_ICC.R`: Solves implied cost of capital (ICC) from analyst data and saves paired current/next-period ICC inputs.
@@ -69,3 +73,21 @@ Skip 4b and 4c, go to 6a
 - `8e1_Using_JC_Code_Input_Individual_LTG.R`: Re-runs LTG mechanism tests using individual-level detailed LTG change inputs.
 - `8f_Compare_Detail_JD_JC.R`: Compares old vs detailed LTG change constructions and visualizes their cross-sectional correlation over time.
 - `runmefirst.R`: Shared environment bootstrap script that loads packages, options, and common settings used by most scripts.
+
+
+# `tables/` subfolders
+
+- **corr_with_fm** — each signal’s correlation with factor momentum.
+	- done
+- **fm_reg_combined** — LaTeX table of Fama–MacBeth regression output for the combined predictor (`tmp/other_methods/.../fm_results_summary.RDS`).
+	- done
+- **liq_illiq_combined** — LaTeX (and related Rmd) tables from liquidity-conditioned pairwise decomposition (`pairwise_decom_table.Rds`), mainly spread vs volume side-by-side; extra Rmds for bid–ask and dollar-volume variants.
+	- done. Code.Rmd is the main file. The others are just for visualization via pdf (all not large)
+- **reversal_decomp_nw** — Newey–West results for combined signals by decomposition (total / sym / asy). 
+	- Done. 
+- **reversal_nw** — Newey–West total across return horizons. 
+	- Done
+- **ts_reg_combined** — time-series spanning results. 
+	- done
+
+

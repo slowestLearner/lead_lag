@@ -1,4 +1,5 @@
-rm(list = setdiff(ls(), 'data_bk')); gc()
+rm(list = setdiff(ls(), "data_bk"))
+gc()
 library(arrow)
 library(fixest)
 library(ggplot2)
@@ -21,4 +22,4 @@ library(stringr)
 library(lubridate)
 library(fs)
 library(readr)
-nc = detectCores() - 2
+nc <- detectCores() - 2

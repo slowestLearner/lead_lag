@@ -31,25 +31,33 @@ library(tidyr)
 library(xtable)
 library(pracma)
 library(fs)
-# library(rstudioapi)
 library(this.path)
 
 # set working directory to be the root of the code
 setwd(this.path::this.dir())
-for (stock_base in c("all", "large")){
+for (stock_base in c("all", "large")) {
   # regression results
-  data <- readRDS(paste0("../../tmp/portfolio_results/", stock_base,
-                         "/statistics/newey_west/remove_20pct_stk_FALSE.RDS")) %>%
+
+  # data <- readRDS(paste0(
+  #   "../../tmp/portfolio_results/", stock_base,
+  #   "/statistics/newey_west/remove_20pct_stk_FALSE.RDS"
+
+  data <- readRDS(paste0(
+    "../../tmp/portfolio_results/", stock_base,
+    "/statistics/newey_west/scale_by_total.RDS"
+  )) %>%
     filter(var_type == "total") %>%
     filter(hor_idx %in% 1:5) %>%
     filter(!grepl("combined_", var)) %>%
     mutate(coef = 100 * coef, se = 100 * se, hor_lab = paste0(from_hor, " $\\rightarrow$ ", to_hor)) %>%
     select(var, coef, se, hor_lab, hor_idx) %>%
     setDT()
-  
+
   # order the variables
-  tmp <- readRDS(paste0("../../tmp/processed_signals/", stock_base,
-                        "/signal_availability.RDS")) %>%
+  tmp <- readRDS(paste0(
+    "../../tmp/processed_signals/", stock_base,
+    "/signal_availability.RDS"
+  )) %>%
     group_by(var, var_lab) %>%
     summarize(first_ym = min(yyyymm), .groups = "drop") %>%
     arrange(first_ym) %>%
@@ -62,7 +70,7 @@ for (stock_base in c("all", "large")){
     select(-first_ym)
   data <- merge(data, tmp, by = "var")
   rm(tmp)
-  
+
   # add stars
   cuts <- abs(qnorm(c(.01, .05, .1) / 2))
   data[, abs_tstat := abs(coef / se)]
@@ -76,23 +84,23 @@ for (stock_base in c("all", "large")){
   })]
   data[, coef_lab := paste0(coef_lab, ss_lab)]
   data[, ss_lab := NULL]
-  
+
   est <- cast(data[, list(var_idx, hor_idx, coef_lab)], var_idx ~ hor_idx)
   est[is.na(est)] <- ""
-  
+
   se <- cast(data[, list(var_idx, hor_idx, se)], var_idx ~ hor_idx) %>%
     dplyr::mutate_at(vars(2:6), ~ paste0("$(", sprintf("%.2f", round(., 2)), ")$")) %>%
     select(-var_idx)
-  
+
   tbl <- data.table(bind_cols(est, se))
   rm(est, se)
-  
+
   # add col columns
   col_names <- data.table(t(as.data.frame(c("", paste0("(", 1:10, ")")))))
   names(col_names) <- names(tbl)
   tbl <- rbind(col_names, tbl)
   rm(col_names)
-  
+
   # get labels right
   tbl[, var_idx := c("", unique(data[, .(var_lab, var_idx)][order(var_idx)])[, var_lab])]
   pp <- unique(data[, .(hor_idx, hor_lab)])[order(hor_idx)][, hor_lab]
@@ -100,10 +108,10 @@ for (stock_base in c("all", "large")){
   names(tt) <- names(tbl)
   tbl <- rbind(tt, tbl)
   rm(tt, pp)
-  
+
   align_vector <- paste0("ll", paste0(rep("c", times = ncol(tbl) - 1), collapse = ""))
   x.side <- xtable(tbl, align = align_vector)
-  
+
   this_add_to_row <- list(
     pos = list(0, 1, 1, 2, nrow(tbl)),
     command = c(

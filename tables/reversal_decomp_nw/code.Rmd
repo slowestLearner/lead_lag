@@ -34,27 +34,33 @@ library(fs)
 
 # set working directory to be the root of the code
 setwd(this.path::this.dir())
-for (stock_base in c("all", "large")){
+for (stock_base in c("all", "large")) {
+  # stock_base <- 'all'
+
   # estimated results
-  data <- readRDS(paste0("../../tmp/portfolio_results/", stock_base,
-  "/statistics/newey_west/remove_20pct_stk_FALSE.RDS")) %>%
+  data <- readRDS(paste0(
+    "../../tmp/portfolio_results/", stock_base,
+    "/statistics/newey_west/scale_by_total.RDS"
+  )) %>%
     filter(grepl("combined", var)) %>%
     filter(hor_idx %in% 1:5) %>%
     mutate(hor_lab = paste0(from_hor, " $\\rightarrow$ ", to_hor), coef = 100 * coef, se = 100 * se) %>%
     select(var, var_type, hor_idx, hor_lab, coef, se)
-  
+
   # also need to have symmetric and asymmetric ratios
-  ratio_data <- readRDS(paste0("../../tmp/portfolio_results/", stock_base,
-  "/statistics/newey_west_fraction/summary/port_returns_remove_20pct_stk_FALSE.RDS")) %>%
+  ratio_data <- readRDS(paste0(
+    "../../tmp/portfolio_results/", stock_base,
+    "/statistics/newey_west_fraction/summary/port_returns_remove_20pct_stk_FALSE.RDS"
+  )) %>%
     filter(grepl("combined", var)) %>%
     rename(hor_idx = hor) %>%
     mutate(hor_idx = ifelse(hor_idx == 1, 1, 2)) %>%
     mutate(hor_lab = ifelse(hor_idx == 1, "1 $\\rightarrow$ 1", "1 $\\rightarrow$ 12")) %>%
     rename(coef = ratio, var_type = type)
-  
+
   data <- rbind(data, ratio_data)
   rm(ratio_data)
-  
+
   # separate samples
   data <- data[, .(var)] %>%
     unique() %>%
@@ -62,24 +68,28 @@ for (stock_base in c("all", "large")){
     mutate(period_idx = row_number()) %>%
     inner_join(data, by = "var") %>%
     select(-var)
-  
+
   # order the variables
   tmp <- unique(data[, .(period_idx, var_type)])
   tmp <- unique(tmp[, .(var_type)]) %>%
     arrange() %>%
-    mutate(xx = c(3, 2, 1, 5, 4),
-         xx = case_when(var_type == "sym"~2,
-                        var_type == "asy"~3,
-                        var_type == "total"~1,
-                        var_type == "asy_to_total"~5,
-                        var_type == "sym_to_total"~4)) %>%
+    mutate(
+      xx = c(3, 2, 1, 5, 4),
+      xx = case_when(
+        var_type == "sym" ~ 2,
+        var_type == "asy" ~ 3,
+        var_type == "total" ~ 1,
+        var_type == "asy_to_total" ~ 5,
+        var_type == "sym_to_total" ~ 4
+      )
+    ) %>%
     inner_join(tmp, by = "var_type") %>%
     arrange(period_idx, xx) %>%
     select(-xx) %>%
     mutate(row_idx = row_number())
   data <- merge(data, tmp, by = c("var_type", "period_idx"))
   rm(tmp)
-  
+
   # add stars
   cuts <- abs(qnorm(c(.01, .05, .1) / 2))
   data[, abs_tstat := abs(coef / se)]
@@ -93,24 +103,24 @@ for (stock_base in c("all", "large")){
   })]
   data[, coef_lab := paste0(coef_lab, ss_lab)]
   data[, ss_lab := NULL]
-  
+
   est <- cast(data[, list(row_idx, hor_idx, coef_lab)], row_idx ~ hor_idx)
   est[is.na(est)] <- ""
-  
+
   se <- cast(data[, list(row_idx, hor_idx, se)], row_idx ~ hor_idx) %>%
     dplyr::mutate_at(vars(2:6), ~ paste0("$(", sprintf("%.2f", round(., 2)), ")$")) %>%
     select(-row_idx)
   se[se == "$(NA)$"] <- ""
-  
+
   tbl <- data.table(bind_cols(est, se))
   rm(est, se)
-  
+
   # add col columns
   col_names <- data.table(t(as.data.frame(c("", paste0("(", 1:10, ")")))))
   names(col_names) <- names(tbl)
   tbl <- rbind(col_names, tbl)
   rm(col_names)
-  
+
   # get labels right
   tbl[, row_idx := c("", rep(c("Total (\\%)", "Symmetric (\\%)", "Asymmetric (\\%)", "Symmetric/Total", "Asymmetric/total"), 3))]
   pp <- unique(data[, .(hor_idx, hor_lab)])[order(hor_idx)][, hor_lab]
@@ -118,15 +128,15 @@ for (stock_base in c("all", "large")){
   names(tt) <- names(tbl)
   tbl <- rbind(tt, tbl)
   rm(tt, pp)
-  
+
   # add another one
   tt <- data.table(c("", "", "", "", "Full sample", "", "", "", "", "1926-1962", "", "", "", "", "1963-2023", "", ""))
   tbl <- cbind(tt, tbl)
   rm(tt)
-  
+
   align_vector <- paste0("ll", paste0(rep("c", times = ncol(tbl) - 1), collapse = ""))
   x.side <- xtable(tbl, align = align_vector)
-  
+
   this_add_to_row <- list(
     pos = list(0, 1, 1, 4, 6, 7, 9, 11, 12, 14, nrow(tbl)),
     command = c(
