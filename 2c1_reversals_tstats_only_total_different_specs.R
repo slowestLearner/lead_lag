@@ -70,13 +70,13 @@ for (stock_base in c("all", "large")) {
   saveRDS(data, paste0(to_dir, "newey_west_fm_residuals.RDS"))
 }
 
-# --- SANITY: check results
+# # --- SANITY: check results
 
-data <- readRDS("tmp/portfolio_results/all/statistics/newey_west/newey_west_fm_residuals.RDS")
-data[, hor_m := round(hor * 12)]
-dcast(data[(var == "combined") & (hor_m %in% c(1, 12, 60, 84, 120)), round(mean(100 * coef), 2), .(hor_m, var_type)], var_type ~ hor_m)
+# data <- readRDS("tmp/portfolio_results/all/statistics/newey_west/newey_west_fm_residuals.RDS")
+# data[, hor_m := round(hor * 12)]
+# dcast(data[(var == "combined") & (hor_m %in% c(1, 12, 60, 84, 120)), round(mean(100 * coef), 2), .(hor_m, var_type)], var_type ~ hor_m)
 
-ggplot(data[var == "combined"], aes(x = hor, y = coef, fill = var_type)) +
-  geom_line(aes(color = var_type), lwd = 2) +
-  geom_hline(yintercept = 0, lty = 3, lwd = 2) +
-  theme_classic()
+# ggplot(data[var == "combined"], aes(x = hor, y = coef, fill = var_type)) +
+#   geom_line(aes(color = var_type), lwd = 2) +
+#   geom_hline(yintercept = 0, lty = 3, lwd = 2) +
+#   theme_classic()

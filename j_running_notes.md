@@ -1,3 +1,17 @@
+# Writing things
+
+- We no longer do unif[-0.5, 0.5] transformation! We are just using raw signals! 
+	- The combination is z-scores or no? 
+- These are demeaned by period, right? 
+	- signal_demean
+- 
+
+these are already mean zero, right? how? 
+
+~/Dropbox/SpeculativeIdeas/Leadlag/data/signal_demean/
+
+
+
 # Top-Level R Script Summaries (`code_final`)
 
 Skip 4b and 4c, go to 6a
@@ -5,6 +19,8 @@ Skip 4b and 4c, go to 6a
 - `0_main_file.R`: Master runner script that sources the main preprocessing and reversal/statistics scripts in sequence.
 - `1a_signal_availability.R`: Computes monthly equal- and value-weighted coverage rates of each signal across the stock universe.
 	- fixed a bug. The current output in signal_availability.RDS always has “availability = 100%”. Fixed.
+- `1b_imputing_predictors.R`
+	- NEW
 - `2a1_get_residuals_of_csm_signals.R`: Residualizes total CSM signals on characteristics and industry controls, then saves cleaned signal panels.
 	- have some differences from earlier signals due to different (i,j) universe requirements
 - `2a2_get_residuals_of_csm_signals_super_set.R`: Residualizes CSM signals using a larger literature control set and saves the supersetted residual signals.
@@ -75,8 +91,9 @@ Skip 4b and 4c, go to 6a
 - `runmefirst.R`: Shared environment bootstrap script that loads packages, options, and common settings used by most scripts.
 
 
-# `tables/` subfolders
+## `tables/`
 
+- **combining_predictors** — combining 8 into 1 using a regression (TODO)
 - **corr_with_fm** — each signal’s correlation with factor momentum.
 	- done
 - **fm_reg_combined** — LaTeX table of Fama–MacBeth regression output for the combined predictor (`tmp/other_methods/.../fm_results_summary.RDS`).
@@ -91,3 +108,13 @@ Skip 4b and 4c, go to 6a
 	- done
 
 
+## `plots/`
+
+- `1_reversal_with_fm.R`
+- `1a_reversals_main.R`
+- `1b_reversals_spanning_factor_mom.R'
+- `1c_reversals_fm_controls.R`
+- `1d_survival_rate.R`
+- `2a_profit_fraction_of_sym.R`
+- `4a_liquidity_target_stock_sort.R`
+- `5a_mechanism_ltg.R`

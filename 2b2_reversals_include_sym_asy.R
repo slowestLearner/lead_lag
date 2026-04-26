@@ -4,7 +4,7 @@ setwd(this.path::this.dir())
 source("runmefirst.R")
 
 for (stock_base in c("all", "large")) {
-  # stock_base <- 'all'
+  # stock_base <- 'large'
 
   tic("loading data")
   if (.Platform$OS.type == "windows") {
@@ -12,7 +12,6 @@ for (stock_base in c("all", "large")) {
   } else {
     base_dir <- paste0("~/Dropbox/SpeculativeIdeas/Leadlag/data/signal_demean/", stock_base)
   }
-
 
   file_map <- c(
     "Analyst.Rds"     = "analyst",
@@ -24,7 +23,6 @@ for (stock_base in c("all", "large")) {
     "Pseudo.Rds"      = "pseudo",
     "Tec.Rds"         = "tech"
   )
-
 
   data_list <- lapply(names(file_map), function(f_name) {
     full_path <- file.path(base_dir, f_name)

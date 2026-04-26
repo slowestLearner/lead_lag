@@ -1,0 +1,103 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[left=1cm,right=1cm,top=0.9cm,bottom=1.2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{natbib}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\begin{tabular}{lccccccccc}
+   \toprule
+                        \multicolumn{10}{c}{Dependent variable: $r_{i,t+1}$ (in \%)} \\
+ \hline \vspace{5pt} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) & (9) \\ 
+  Industry momentum & $0.076^{**}$ & $0.293^{***}$ &  &  &  &  &  &  &  \\ 
+   & $(0.03)$ & $(0.05)$ &  &  &  &  &  &  &  \\ 
+  BEA customer & $-0.058^{*}$ &  & $0.227^{***}$ &  &  &  &  &  &  \\ 
+   & $(0.03)$ &  & $(0.05)$ &  &  &  &  &  &  \\ 
+  BEA supplier & $0.007$ &  &  & $0.209^{***}$ &  &  &  &  &  \\ 
+   & $(0.04)$ &  &  & $(0.05)$ &  &  &  &  &  \\ 
+  Technology link & $0.019$ &  &  &  & $0.214^{***}$ &  &  &  &  \\ 
+   & $(0.03)$ &  &  &  & $(0.05)$ &  &  &  &  \\ 
+  Geographic link & $0.017$ &  &  &  &  & $0.112^{***}$ &  &  &  \\ 
+   & $(0.02)$ &  &  &  &  & $(0.02)$ &  &  &  \\ 
+  Complicated firms & $0.002$ &  &  &  &  &  & $0.209^{***}$ &  &  \\ 
+   & $(0.03)$ &  &  &  &  &  & $(0.03)$ &  &  \\ 
+  Economic link & $0.010$ &  &  &  &  &  &  & $0.180^{***}$ &  \\ 
+   & $(0.03)$ &  &  &  &  &  &  & $(0.02)$ &  \\ 
+  Analyst coverage & $0.383^{***}$ &  &  &  &  &  &  &  & $0.412^{***}$ \\ 
+   \vspace{5pt} & $(0.09)$ &  &  &  &  &  &  &  & $(0.08)$ \\ 
+   \vspace{5pt}Time FE & Y & Y & Y & Y & Y & Y & Y & Y & Y \\ 
+  Obs & 1,584,943 & 1,584,943 & 1,584,943 & 1,584,943 & 1,584,943 & 1,584,943 & 1,584,943 & 1,584,943 & 1,584,943 \\ 
+  Within $R^2$ & $0.15\%$ & $0.07\%$ & $0.04\%$ & $0.04\%$ & $0.03\%$ & $0.01\%$ & $0.04\%$ & $0.03\%$ & $0.15\%$ \\ 
+   \bottomrule 
+\end{tabular}
+
+\end{document}

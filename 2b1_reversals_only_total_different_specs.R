@@ -5,22 +5,22 @@ source("runmefirst.R")
 
 # -- get raw signals
 for (stock_base in c("all", "large")) {
-  # stock_base <- "all"
+  # stock_base <- "large"
   tic("loading data")
   signal_base <- file.path("tmp/raw_data/signals", stock_base, "total_signal")
-  
+
   # three versions of signals
   df_1 <- readRDS(paste0(signal_base, "/fm_residualized.RDS")) %>% setDT()
   df_2 <- readRDS(paste0(signal_base, "/fm_residualized_super_set.RDS")) %>% setDT()
   df_3 <- readRDS(paste0(signal_base, "/signals_bh.RDS")) %>% setDT()
-  
+
   # merge signals together
   merge_keys <- c("yyyymm", "var", "permno")
   signal_data <- Reduce(
     function(x, y) merge(x, y, by = merge_keys, all.x = T),
     list(df_1, df_2, df_3)
   ) %>%
-  # signal_data <- df_1 %>%
+    # signal_data <- df_1 %>%
     data.table::melt(
       id.vars = c("yyyymm", "permno", "var"),
       variable.name = "var_type",
@@ -31,32 +31,34 @@ for (stock_base in c("all", "large")) {
     setDT()
   rm(df_1, df_2, df_3)
   gc()
-  
+
+
+
   # get stock returns
   ret_data <- readRDS("../../data/Stocks/Monthly_CRSP.RDS") %>%
     mutate(factor_model = "raw") %>%
     select(yyyymm, permno, factor_model, me_1, ret)
-  
+
   # change timing to start from 1m after the signals
   tmp <- ret_data[, .(yyyymm)] %>%
     unique() %>%
     mutate(mm = yyyymm - 100 * floor(yyyymm / 100)) %>%
     mutate(yyyymm_prev = if_else(mm == 1, yyyymm - 100 + 11, yyyymm - 1)) %>%
     dplyr::select(-mm)
-  
+
   ret_data <- merge(ret_data, tmp, by = "yyyymm") %>%
     mutate(yyyymm = yyyymm_prev) %>%
     select(-yyyymm_prev) %>%
     dplyr::rename(ret1 = ret, me = me_1) %>%
     setDT()
   rm(tmp)
-  
+
   # look at the part that overlaps with the stock uinverse
   target_keys <- unique(ret_data[, .(yyyymm, permno)])
   setkey(signal_data, yyyymm, permno)
   setkey(target_keys, yyyymm, permno)
   signal_data <- signal_data[target_keys, nomatch = 0]
-  
+
   # get common time grid with index 'idx'
   time_data <- ret_data[, .(yyyymm)] %>%
     unique() %>%
@@ -65,71 +67,70 @@ for (stock_base in c("all", "large")) {
   ret_data <- merge(ret_data, time_data, by = "yyyymm")
   signal_data <- merge(signal_data, time_data, by = "yyyymm")
   rm(time_data)
-  
+
   toc()
-  
-  
+
   # save returns, as well as scaling, here
   to_dir_scaling <- paste0("tmp/portfolio_results/", stock_base, "/just_total_with_fm_controls/scaling/")
   to_dir <- paste0("tmp/portfolio_results/", stock_base, "/just_total_with_fm_controls/returns/")
   dir.create(to_dir_scaling, showWarnings = FALSE, recursive = TRUE)
   dir.create(to_dir, showWarnings = FALSE, recursive = TRUE)
-  
+
   # function to process one horizon
   # this_hor <- 0
   run_horizon <- function(this_hor, signal_data, ret_data, to_dir_scaling, to_dir) {
     tic(paste0("Processing horizon: ", this_hor))
-    
+
     # save results here
     file_scaling_path <- paste0(to_dir_scaling, "hor_", this_hor, ".RDS")
     file_out_path <- paste0(to_dir, this_hor, ".RDS")
-    
+
     if (file.exists(file_scaling_path) && file.exists(file_out_path)) {
       return(paste0("Skipped (Exists): ", this_hor))
     }
     # 1. Create the lagged index
     signal_data[, idx_target := idx + this_hor]
-    
+
     # 2. Perform the join
     # Using 'i' explicitly for clarity
     data <- ret_data[signal_data,
-                     .(
-                       yyyymm = i.yyyymm,
-                       permno,
-                       factor_model,
-                       var,
-                       var_type,
-                       signal,
-                       ret_fut = ret1
-                     ),
-                     on = .(idx = idx_target, permno),
-                     nomatch = 0
+      .(
+        yyyymm = i.yyyymm,
+        permno,
+        factor_model,
+        var,
+        var_type,
+        signal,
+        ret_fut = ret1
+      ),
+      on = .(idx = idx_target, permno),
+      nomatch = 0
     ] %>% na.omit()
     signal_data[, idx_target := NULL]
-    
+
     rm(signal_data, ret_data)
     gc()
-    
+
     # 3. Demean signal once more
     data[, signal := signal - mean(signal), .(yyyymm, var, var_type, factor_model)]
-    
+
     # 4. Save scaling
     scale_data <- data[
       , .(hor = this_hor, sum_of_abs_signal_total = sum(abs(signal))),
       .(yyyymm, var, var_type, factor_model)
     ]
     saveRDS(scale_data, file_scaling_path)
-    
+
     # 5. Apply scaling
     # We can skip 'hor := NULL' on scale_data since we don't reuse it
     data[scale_data,
-         sum_of_abs_signal_total := i.sum_of_abs_signal_total,
-         on = .(yyyymm, var, var_type, factor_model)
+      sum_of_abs_signal_total := i.sum_of_abs_signal_total,
+      on = .(yyyymm, var, var_type, factor_model)
     ]
     rm(scale_data)
     data[, signal := 2 * signal / sum_of_abs_signal_total]
     data[, sum_of_abs_signal_total := NULL]
-    
+
     # 6. Process portfolio and save
     data[, port_w_ew := signal]
     out <- data[, .(
@@ -146,7 +147,7 @@ for (stock_base in c("all", "large")) {
     return(paste("Done", this_hor))
     toc()
   }
-  
+
   gc()
   plan(multisession, workers = 2)
   results <- future_lapply(
@@ -161,24 +162,24 @@ for (stock_base in c("all", "large")) {
     future.scheduling = 10
   )
   plan(sequential)
-  
+
   # Let's join the loose files, save together, and then delete the loose files
   files <- list.files(to_dir, full.names = TRUE)
-  
+
   plan(multisession, workers = nc)
   out <- rbindlist(future_lapply(files, readRDS))
   plan(sequential)
-  
+
   to_file <- paste0(substr(to_dir, 1, nchar(to_dir) - 1), ".RDS")
   saveRDS(out, to_file)
   unlink(to_dir, recursive = TRUE)
-  
+
   files <- list.files(to_dir_scaling, full.names = TRUE)
-  
+
   plan(multisession, workers = nc)
   out <- rbindlist(future_lapply(files, readRDS))
   plan(sequential)
-  
+
   to_file <- paste0(substr(to_dir_scaling, 1, nchar(to_dir_scaling) - 1), ".RDS")
   saveRDS(out, to_file)
   unlink(to_dir_scaling, recursive = TRUE)

@@ -1,0 +1,176 @@
+---
+author: ""
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{float}
+   - \usepackage{natbib}
+   - \usepackage{booktabs}
+   - \usepackage{multirow}
+geometry: "left=1cm,right=1cm,top=0.9cm,bottom=1.2cm"
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    number_sections: true
+#bibliography: ref.bib
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo = FALSE, results = 'asis', warning=FALSE, message=FALSE}
+rm(list = ls())
+options(xtable.comment = FALSE)
+library(reshape)
+library(data.table)
+library(dplyr)
+library(naniar)
+library(scales)
+library(tidyr)
+library(xtable)
+library(pracma)
+library(this.path)
+setwd(this.path::this.dir())
+
+# joint and individual regression results
+data <- readRDS("../../tmp/processed_signals/large/signal_combining_panel/regression_result.RDS")[, spec_idx := 1]
+tmp <- readRDS("../../tmp/processed_signals/large/signal_combining_panel/regression_result_one_by_one.RDS")
+
+# Let's order them
+tt <- tmp[, .(var, first_ym)]
+tt <- tt[order(first_ym)]
+tt[, var_idx := 1:nrow(tt)]
+tt[, first_ym := NULL]
+data <- merge(data, tt, by = "var")
+tmp <- merge(tmp, tt, by = "var")
+tmp[, c("first_ym", "spec_var") := NULL]
+tmp[, spec_idx := var_idx + 1]
+data <- rbind(data, tmp)
+rm(tmp, tt)
+
+# get variable labels
+tmp <- readRDS("../../tmp/processed_signals/large/signal_availability.RDS")
+tmp <- unique(tmp[, .(var, var_lab)])
+data <- merge(data, tmp, by = "var")
+rm(tmp)
+
+# make more readable
+data[, coef := 100 * coef]
+data[, se := 100 * se]
+
+# add stars
+cuts <- abs(qnorm(c(.01, .05, .1) / 2))
+data[, abs_tstat := abs(coef / se)]
+data[, ss := ifelse(abs_tstat > cuts[1], 3, ifelse(abs_tstat > cuts[2], 2, ifelse(abs_tstat > cuts[3], 1, 0)))]
+data[, coef_lab := paste0("$", sprintf("%.3f", coef))]
+data[, ss_lab := sapply(data[, ss], function(x) {
+  ifelse(x > 0,
+    paste0("^{", strcat(rep("*", x)), "}$"),
+    "$"
+  )
+})]
+data[, coef_lab := paste0(coef_lab, ss_lab)]
+data[, ss_lab := NULL]
+data <- data[order(spec_idx, var_idx)]
+
+est <- cast(data[, list(var_idx, spec_idx, coef_lab)], var_idx ~ spec_idx, value = "coef_lab") %>%
+  dplyr::mutate(group_id = 100 * row_number(), type = "coef")
+est[is.na(est)] <- ""
+
+se <- cast(data[, list(var_idx, spec_idx, se)], var_idx ~ spec_idx, value = "se") %>%
+  dplyr::mutate(group_id = 100 * row_number() + 1, type = "se") %>%
+  dplyr::mutate_at(vars(2:10), ~ paste0("$(", sprintf("%.2f", round(., 2)), ")$"))
+se[se == "$(NA)$"] <- ""
+
+tbl <- bind_rows(est, se)
+rm(est, se)
+names(tbl)[1] <- "var_lab"
+
+tt <- unique(data[, .(var_idx, var_lab)])[order(var_idx)]
+tt <- tt[, var_lab]
+tbl$var_lab <- c(tt, rep("", 8))
+
+# note controls
+ctrls <- data.table(
+  var_lab = c("Time FE"),
+  `1` = c("Y"), `2` = c("Y"),
+  `3` = c("Y"), `4` = c("Y"),
+  `5` = c("Y"), `6` = c("Y"),
+  `7` = c("Y"), `8` = c("Y"),
+  `9` = c("Y"),
+  group_id = c(1001), type = ""
+)
+tbl <- bind_rows(tbl, ctrls)
+rm(ctrls)
+
+obs_and_r2 <- unique(data[, list(spec_idx, obs, r2 = war2)][order(spec_idx)]) %>%
+  mutate(
+    obs = comma(obs),
+    r2 = paste0("$", sprintf("%.2f", 100 * r2), "\\%$")
+  ) %>%
+  pivot_longer(., -spec_idx) %>%
+  pivot_wider(name, names_from = "spec_idx", values_from = "value") %>%
+  dplyr::mutate(name = replace(name, name == "r2", "Within $R^2$")) %>%
+  mutate(name = replace(name, name == "obs", "Obs")) %>%
+  dplyr::rename(var_lab = name) %>%
+  mutate(group_id = c(1101, 1102), type = "")
+
+tbl <- bind_rows(tbl, obs_and_r2) %>%
+  dplyr::arrange(group_id) %>%
+  mutate(var_lab = ifelse(type == "se", "", var_lab)) %>%
+  mutate(type = NULL, group_id = NULL)
+rm(obs_and_r2)
+
+# add col columns
+col_names <- data.table(t(as.data.frame(c("", paste0("(", 1:(ncol(tbl) - 1), ")")))))
+names(col_names) <- names(tbl)
+tbl <- bind_rows(col_names, tbl)
+rm(col_names)
+
+align_vactor <- paste0("ll", paste0(rep("c", times = ncol(tbl) - 1), collapse = ""))
+x.side <- xtable(tbl, align = align_vactor)
+
+print(x.side,
+  type = "latex",
+  table.placement = "!ht",
+  include.rownames = FALSE,
+  include.colnames = FALSE,
+  tabular.environment = "tabular",
+  caption.placement = NULL, # "top", NULL
+  hline.after = NULL, # We don't need hline; we use booktabs
+  floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+  sanitize.text.function = force, # Important to treat content of first column as latex function
+  add.to.row = list(
+    pos = list(0, 0, 16, 17, nrow(tbl)),
+    command = c(
+      "\\toprule
+                        \\multicolumn{10}{c}{Dependent variable: $r_{i,t+1}$ (in \\%)} \\\\\n \\hline",
+      rep("\\vspace{5pt}", 3),
+      "\\bottomrule \n"
+    )
+  )
+)
+
+
+print(x.side,
+  type = "latex",
+  table.placement = "!ht",
+  include.rownames = FALSE,
+  include.colnames = FALSE,
+  tabular.environment = "tabular",
+  caption.placement = NULL, # "top", NULL
+  hline.after = NULL, # We don't need hline; we use booktabs
+  floating = FALSE, # whether \begin{Table} should be created (TRUE) or not (FALSE)
+  sanitize.text.function = force, # Important to treat content of first column as latex function
+  add.to.row = list(
+    pos = list(0, 0, 16, 17, nrow(tbl)),
+    command = c(
+      "\\toprule
+                        \\multicolumn{10}{c}{Dependent variable: $r_{i,t+1}$ (in \\%)} \\\\\n \\hline",
+      rep("\\vspace{5pt}", 3),
+      "\\bottomrule \n"
+    )
+  ),
+  file = "combining_predictors.tex"
+)
+```

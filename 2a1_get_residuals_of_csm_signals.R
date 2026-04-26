@@ -3,10 +3,9 @@ library(this.path)
 setwd(this.path::this.dir()) # set working directory to be the root of the code
 source("runmefirst.R")
 
-
 # -- get signals
 for (stock_base in c("all", "large")) {
-  # stock_base <- 'all'
+  # stock_base <- 'large'
   tic("loading data")
   if (.Platform$OS.type == "windows") {
     base_dir <- paste0("D:/Dropbox/Leadlag/data/signal_demean/", stock_base)
