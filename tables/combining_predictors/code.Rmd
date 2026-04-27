@@ -33,7 +33,7 @@ library(this.path)
 setwd(this.path::this.dir())
 
 # joint and individual regression results
-data <- readRDS("../../tmp/processed_signals/large/signal_combining_panel/regression_result.RDS")[, spec_idx := 1]
+data <- readRDS("../../tmp/processed_signals/large/signal_combining_panel/regression_result.RDS")[, spec_idx := 9]
 tmp <- readRDS("../../tmp/processed_signals/large/signal_combining_panel/regression_result_one_by_one.RDS")
 
 # Let's order them
@@ -44,7 +44,7 @@ tt[, first_ym := NULL]
 data <- merge(data, tt, by = "var")
 tmp <- merge(tmp, tt, by = "var")
 tmp[, c("first_ym", "spec_var") := NULL]
-tmp[, spec_idx := var_idx + 1]
+tmp[, spec_idx := var_idx]
 data <- rbind(data, tmp)
 rm(tmp, tt)
 

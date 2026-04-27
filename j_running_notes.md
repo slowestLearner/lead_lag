@@ -1,20 +1,49 @@
-# Writing things
+# Questions
 
-- We no longer do unif[-0.5, 0.5] transformation! We are just using raw signals! 
-	- The combination is z-scores or no? 
-- These are demeaned by period, right? 
-	- signal_demean
+- If we are tracing portfolio returns, the weights need to be updated as returns realize? 
 - 
 
-these are already mean zero, right? how? 
 
-~/Dropbox/SpeculativeIdeas/Leadlag/data/signal_demean/
+1. Introduction `{sec:intro}`
+  - Related literature `{sec:intro:related}`
+
+2. Cross-Stock Momentum Reverses `{sec:reversal}`
+  - Data and cross-stock momentum predictors `{sec:reversal:data}`
+  - Computing cross-stock momentum predictors `{sec:reversal:computation}`
+  - Cross-stock momentum reverses `{sec:reversal:portfolio}`
+  - Robustness `{sec:reversal:robustness}`
+
+3. Decomposing Cross-Stock Momentum `{sec:decomp}`
+  - Common components revert: preliminary evidence `{sec:decomp:preliminary}`
+  - CSM Decomposition `{sec:decomp:methodology}`
+  - The common component accounts for the reversal `{sec:decomp:reversal}`
+  
+4. Interpreting Decomposed CSM Components `{sec:understanding}`
+  - The symmetric component `{sec:understanding:sym}`
+  - The asymmetric component: liquid stocks lead illiquid ones `{sec:understanding:asy}`
+
+5. Relationship with factor and stock momentum `{sec:other_momentum}`
+
+6. Conclusion `{sec:conclusion}`
+
+-- Appendix
+
+- A. Additional Empirical Results `{app:empirical}`
+  - Delisting `{app:empirical:delisting}`
+  - Bootstrapping standard errors `{app:empirical:bootstrap}`
+  - CSM reversals: robustness `{app:empirical:robustness}`
+  - Regression-based combination of CSM predictors `{app:empirical:combining}`
+  - Price-level analysis `{app:empirical:price_level}`
+  - Peer versus focal portfolios `{app:empirical:common}`
+
+- B. CSM Decomposition `{app:decomp}`
+  - Expressing CSM predictors using prediction matrices `{app:decomp:prediction_matrix}`
+  - Additional details `{app:decomp:additional}`
 
 
 
 # Top-Level R Script Summaries (`code_final`)
 
-Skip 4b and 4c, go to 6a
 
 - `0_main_file.R`: Master runner script that sources the main preprocessing and reversal/statistics scripts in sequence.
 - `1a_signal_availability.R`: Computes monthly equal- and value-weighted coverage rates of each signal across the stock universe.
@@ -110,11 +139,14 @@ Skip 4b and 4c, go to 6a
 
 ## `plots/`
 
-- `1_reversal_with_fm.R`
-- `1a_reversals_main.R`
-- `1b_reversals_spanning_factor_mom.R'
-- `1c_reversals_fm_controls.R`
-- `1d_survival_rate.R`
-- `2a_profit_fraction_of_sym.R`
-- `4a_liquidity_target_stock_sort.R`
-- `5a_mechanism_ltg.R`
+- `1_reversal_with_fm.R`: plot CSM return along with factor momentum
+	- Not sure if we still need it
+- `1a_reversals_main.R`: Produces the baseline reversal plots.
+	- done
+- `1a2_reversals_combined_split.R`: main CSM split into two time periods. 
+- `1b_reversals_spanning_factor_mom.R`: Visualizes reversal performance after spanning adjustments on factor momentum.
+- `1c_reversals_fm_controls.R`: Plots reversal paths from specifications that include Fama-MacBeth-style control sets.
+- `1d_survival_rate.R`: Plots portfolio survival/continuation rates to show composition persistence over holding periods.
+- `2a_profit_fraction_of_sym.R`: Visualizes the symmetric/asymmetric share decomposition of combined reversal profits.
+- `4a_liquidity_target_stock_sort.R`: Produces liquidity-target-sorted plots for source-target return spread patterns.
+- `5a_mechanism_ltg.R`: Plots mechanism evidence linking signals to LTG dynamics and related outcome series.
