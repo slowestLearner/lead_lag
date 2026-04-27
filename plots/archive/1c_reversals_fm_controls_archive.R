@@ -1,5 +1,5 @@
 # Do FM controls get rid of the reversal?
-source("~/.runmefirst")
+source("runmefirst.R")
 library(sandwich)
 library(this.path)
 setwd(this.path::this.dir()) # set working directory to be the root of the code

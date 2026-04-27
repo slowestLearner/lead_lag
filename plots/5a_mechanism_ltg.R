@@ -1,7 +1,7 @@
 # plot LTG
-source("~/.runmefirst")
 library(this.path)
 setwd(this.path::this.dir())
+source("runmefirst.R")
 
 
 # already computed

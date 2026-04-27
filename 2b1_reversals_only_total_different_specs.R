@@ -209,7 +209,7 @@ for (stock_base in c("all", "large")) {
 #   filter(hor == 3)
 
 # # old
-# source("~/.runmefirst")
+# source("runmefirst.R")
 # tmp <- readRDS("../code_202511/tmp/portfolio_results/just_total_with_fm_controls/remove_20pct_stk_FALSE/returns.RDS") %>%
 #   filter(var_type == "signal") %>%
 #   na.omit()

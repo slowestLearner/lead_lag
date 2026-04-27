@@ -1,5 +1,5 @@
 # Let's produce some heatmaps - perhaps just for the asy
-source("~/.runmefirst")
+source("runmefirst.R")
 library(this.path)
 library(corrplot)
 library(RColorBrewer)

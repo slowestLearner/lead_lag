@@ -1,5 +1,5 @@
 # sorted into deciles
-source("~/.runmefirst")
+source("runmefirst.R")
 library(this.path)
 library(corrplot)
 library(RColorBrewer)

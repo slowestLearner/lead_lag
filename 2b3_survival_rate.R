@@ -170,7 +170,7 @@ for (stock_base in c("all", "large")) {
 
 # # -- todel
 
-# source("~/.runmefirst")
+# source("runmefirst.R")
 
 # data_new <- j.readDir("tmp/portfolio_results/all/just_total_with_fm_controls/numobs/")
 # data_old <- readRDS("tmp/portfolio_results/all/just_total_with_fm_controls/numobs.RDS")
