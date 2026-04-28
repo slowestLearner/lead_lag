@@ -1,7 +1,7 @@
 # Compute Newey-West t-statistics for cumulative L/S returns. Summarize over horizons of (m -> n) months
-source("runmefirst.R")
 library(this.path)
 setwd(this.path::this.dir())
+source("runmefirst.R")
 
 # different specifications
 for (stock_base in c("all", "large")) {

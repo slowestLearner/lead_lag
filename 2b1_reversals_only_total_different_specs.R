@@ -2,17 +2,20 @@
 library(this.path)
 setwd(this.path::this.dir()) # set working directory to be the root of the code
 source("runmefirst.R")
+optinos(width = 200)
 
 # -- get raw signals
 for (stock_base in c("all", "large")) {
   # stock_base <- "large"
   tic("loading data")
   signal_base <- file.path("tmp/raw_data/signals", stock_base, "total_signal")
-
+  
   # three versions of signals
   df_1 <- readRDS(paste0(signal_base, "/fm_residualized.RDS")) %>% setDT()
   df_2 <- readRDS(paste0(signal_base, "/fm_residualized_super_set.RDS")) %>% setDT()
   df_3 <- readRDS(paste0(signal_base, "/signals_bh.RDS")) %>% setDT()
+
+  df_1[, .(sd(signal), sd(signal_FF3), sd(signal_FF3_ind), sd(signal_FF3_ind_char))]
 
   # merge signals together
   merge_keys <- c("yyyymm", "var", "permno")

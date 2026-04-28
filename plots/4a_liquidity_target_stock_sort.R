@@ -1,9 +1,9 @@
 # sorted into deciles
-source("runmefirst.R")
 library(this.path)
+setwd(this.path::this.dir())
+source("runmefirst.R")
 library(corrplot)
 library(RColorBrewer)
-setwd(this.path::this.dir())
 
 # already computed
 data <- readRDS("../../../tests/27_sym_mechanism_tests/tmp/liquidity/deciles/require_equal_weight_for_total_signal/statistics_deciles_and_quintiles.RDS") %>%

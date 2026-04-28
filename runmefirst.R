@@ -20,6 +20,7 @@ library(stringr)
 library(lubridate)
 library(fs)
 library(readr)
+library(tidyr)
 library(dplyr)
 library(data.table)
 nc <- detectCores() - 2

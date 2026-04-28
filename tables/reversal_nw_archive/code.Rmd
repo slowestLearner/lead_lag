@@ -32,20 +32,23 @@ library(xtable)
 library(pracma)
 library(fs)
 library(this.path)
-setwd(this.path::this.dir())
 
 # set working directory to be the root of the code
+setwd(this.path::this.dir())
 for (stock_base in c("all", "large")) {
-  # stock_base <- 'large'
-
   # regression results
+
+  # data <- readRDS(paste0(
+  #   "../../tmp/portfolio_results/", stock_base,
+  #   "/statistics/newey_west/remove_20pct_stk_FALSE.RDS"
+
   data <- readRDS(paste0(
     "../../tmp/portfolio_results/", stock_base,
     "/statistics/newey_west/scale_by_total.RDS"
   )) %>%
     filter(var_type == "total") %>%
     filter(hor_idx %in% 1:5) %>%
-    # filter(!grepl("combined_", var)) %>%
+    filter(!grepl("combined_", var)) %>%
     mutate(coef = 100 * coef, se = 100 * se, hor_lab = paste0(from_hor, " $\\rightarrow$ ", to_hor)) %>%
     select(var, coef, se, hor_lab, hor_idx) %>%
     setDT()
@@ -61,7 +64,7 @@ for (stock_base in c("all", "large")) {
     setDT() %>%
     mutate(var = gsub("_ret", "", var)) %>%
     mutate(var = ifelse(var == "indu", "industry", ifelse(var == "tec", "tech", var))) %>%
-    bind_rows(., data.table(var = c("combined", "combined_1926_1962", "combined_1963_2023"), var_lab = c("Combined", "Combined (1926-1962)", "Combined (1963-2023)"), first_ym = c(0, 1, 2))) %>%
+    bind_rows(., data.table(var = "combined", var_lab = "Combined predictor", first_ym = 0)) %>%
     arrange(first_ym) %>%
     mutate(var_idx = row_number()) %>%
     select(-first_ym)
@@ -110,7 +113,7 @@ for (stock_base in c("all", "large")) {
   x.side <- xtable(tbl, align = align_vector)
 
   this_add_to_row <- list(
-    pos = list(0, 1, 1, 4, nrow(tbl)),
+    pos = list(0, 1, 1, 2, nrow(tbl)),
     command = c(
       "\\toprule & \\multicolumn{5}{c}{Cumulative returns (\\%)} & \\multicolumn{5}{c}{Standard error (\\%)} \\\\\n \\cmidrule(l){2-6} \\cmidrule(l){7-11}",
       "\\cmidrule(l){2-6} \\cmidrule(l){7-11}",

@@ -1,7 +1,17 @@
-# Questions
+## Current
 
-- If we are tracing portfolio returns, the weights need to be updated as returns realize? 
-- 
+My main feeling is we need to bring back decile results
+	Modifying 2b1
+
+Results that show insensitivity to delisting return --- I guess we just put that aside for now
+
+We said we don't need bootstrap anymore, right? 
+
+If we are tracing portfolio returns, the weights need to be updated as returns realize? 
+
+## Questions
+
+
 
 
 1. Introduction `{sec:intro}`
@@ -33,7 +43,7 @@
   - Bootstrapping standard errors `{app:empirical:bootstrap}`
   - CSM reversals: robustness `{app:empirical:robustness}`
   - Regression-based combination of CSM predictors `{app:empirical:combining}`
-  - Price-level analysis `{app:empirical:price_level}`
+  - Statistical power in assessing long-horizon CSM portfolio returns `{app:empirical:power}`
   - Peer versus focal portfolios `{app:empirical:common}`
 
 - B. CSM Decomposition `{app:decomp}`
@@ -47,9 +57,9 @@
 
 - `0_main_file.R`: Master runner script that sources the main preprocessing and reversal/statistics scripts in sequence.
 - `1a_signal_availability.R`: Computes monthly equal- and value-weighted coverage rates of each signal across the stock universe.
-	- fixed a bug. The current output in signal_availability.RDS always has “availability = 100%”. Fixed.
+	- done
 - `1b_imputing_predictors.R`
-	- NEW
+	- new
 - `2a1_get_residuals_of_csm_signals.R`: Residualizes total CSM signals on characteristics and industry controls, then saves cleaned signal panels.
 	- have some differences from earlier signals due to different (i,j) universe requirements
 - `2a2_get_residuals_of_csm_signals_super_set.R`: Residualizes CSM signals using a larger literature control set and saves the supersetted residual signals.
@@ -57,7 +67,6 @@
 - `2a3_Burt_Hrdlicka_Adjust.R`: Implements Burt-Hrdlicka style adjustments by first estimating factor residuals and then constructing adjusted signals.
 	- NOTE: the first part of the code only runs the regression if factor data is fully available. Is this an issue? You can check "tmp/burt_hrdlicka/CRSP_BH.RDS" and compare with monthly stock returns. They are identical for the first half of the data (where liquidity factor is not present)
 - `2b1_reversals_only_total_different_specs.R`: Builds long-run return paths for total-signal portfolios across multiple signal construction specifications.
-	- this “this_REMOVE_20PCT_STK” thing in director names is redundant, I removed it.
 	- My computer can’t handle much parallel processing on this thing…
 	- Stuck here. Relevant plot of NW results probably produced from 2c1
 - `2b2_reversals_include_sym_asy.R`: Computes portfolio returns for total, symmetric, and asymmetric signal components over multiple horizons.
@@ -146,7 +155,8 @@
 - `1a2_reversals_combined_split.R`: main CSM split into two time periods. 
 - `1b_reversals_spanning_factor_mom.R`: Visualizes reversal performance after spanning adjustments on factor momentum.
 - `1c_reversals_fm_controls.R`: Plots reversal paths from specifications that include Fama-MacBeth-style control sets.
-- `1d_survival_rate.R`: Plots portfolio survival/continuation rates to show composition persistence over holding periods.
+- `1d_survival_rate.R`: survival rates. 
+	- Done. 
 - `2a_profit_fraction_of_sym.R`: Visualizes the symmetric/asymmetric share decomposition of combined reversal profits.
 - `4a_liquidity_target_stock_sort.R`: Produces liquidity-target-sorted plots for source-target return spread patterns.
 - `5a_mechanism_ltg.R`: Plots mechanism evidence linking signals to LTG dynamics and related outcome series.
