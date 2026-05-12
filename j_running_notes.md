@@ -3,11 +3,10 @@
 My main feeling is we need to bring back decile results
 	Modifying 2b1
 
+Buy and hold return - will results be different? 
+
 Results that show insensitivity to delisting return --- I guess we just put that aside for now
 
-We said we don't need bootstrap anymore, right? 
-
-If we are tracing portfolio returns, the weights need to be updated as returns realize? 
 
 ## Questions
 
