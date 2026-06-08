@@ -1,16 +1,8 @@
 # --- This is the crucial script. For each period t, figure out what valuation would have been if we use q from a *previous* period
 library(this.path)
 setwd(this.path::this.dir())
-os_type <- Sys.info()["sysname"]
-
-# Set the file path based on the operating system
-if (os_type == "Windows") {
-  # For Windows
-  source("../runmefirst.R")
-} else {
-  # For macOS and Linux
-  source("~/.runmefirst")
-}
+source("../runmefirst.R")
+options(width = 120)
 
 # we already solved for icc for each period
 data <- readRDS("tmp/valuation/contemporaneous.RDS")

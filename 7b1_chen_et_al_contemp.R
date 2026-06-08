@@ -1,17 +1,19 @@
 # --- Solve for q (discount rate) under Chen et al methodology
 library(this.path)
 setwd(this.path::this.dir())
-os_type <- Sys.info()["sysname"]
+source("../runmefirst.R")
+options(width = 120)
 
-# Set the file path based on the operating system
-if (os_type == "Windows") {
-  # For Windows
-  source("../runmefirst.R")
-} else {
-  # For macOS and Linux
-  source("~/.runmefirst")
-}
+# os_type <- Sys.info()["sysname"]
 
+# # Set the file path based on the operating system
+# if (os_type == "Windows") {
+#   # For Windows
+#   source("../runmefirst.R")
+# } else {
+#   # For macOS and Linux
+#   source("~/.runmefirst")
+# }
 
 # --- first put together all relevant data
 
@@ -102,7 +104,6 @@ p.get_one <- function(tt) {
 blocks <- 30
 data[, idx := .I]
 data[, block_idx := ntile(idx, blocks)]
-
 
 data <- data[ltg > -99 & !is.na(ltg)]
 # Also check industry ltg just in case

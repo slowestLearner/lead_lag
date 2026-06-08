@@ -1,0 +1,271 @@
+---
+author: ""
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{float}
+   - \usepackage{natbib}
+   - \usepackage{booktabs}
+   - \usepackage{xcolor}
+geometry: "left=1cm,right=1cm,top=0.9cm,bottom=1.2cm"
+
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    number_sections: true
+bibliography: ref.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(rio)
+library(latex2exp)
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(lubridate)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(haven)
+library(tidyr)
+library(tidyverse)
+#library(stargazer, quietly = TRUE)
+#library(plm) 
+library(xtable)
+library(RColorBrewer)
+#library(ggrepel)
+#library(ggpmisc)
+library(scales)
+library(lmtest)
+```
+
+
+\section{All}
+```{r fig22a, echo = FALSE, fig.topcaption=TRUE, results = 'asis', fig.height = 4,warning=FALSE, message=FALSE}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+
+stock_base <- "all"
+from_dir <- paste0("tmp/portfolio_results/", stock_base, "/statistics/cf_dr/")
+
+# 1. Load all sensitivity files (h1, h2, h4, h8, h20, h40)
+fill_horizons <- c(1, 2, 4, 8, 20, 40)
+df_list <- lapply(fill_horizons, function(h) {
+  file_path <- paste0(from_dir, "scale_h", h, ".RDS")
+  if (file.exists(file_path)) {
+    dt <- readRDS(file_path)
+    return(dt)
+  }
+  return(NULL)
+})
+
+df_plot_all <- rbindlist(df_list, fill = TRUE) %>%
+  dplyr::filter(var == "combined")
+
+# ============================================================================
+# DATA PREPARATION & HORIZON ALIGNMENT
+# ============================================================================
+df_plot_all <- df_plot_all %>%
+  # Since all horizons (past, future, and anchor) are expressed in calendar months,
+  # dividing by 12 correctly standardizes the entire x-axis timeline to years.
+  mutate(hor_years = hor / 12) %>%
+  
+  # Create clean labels for your facet grid
+  mutate(fill_label = paste0("Fill: ", fill_h, " Quarters")) %>%
+  
+  # Invert past returns to match standard cumulative horizon reporting
+  mutate(coef = case_when(
+    hor < 0  ~ -coef,
+    TRUE   ~ coef
+  )) %>%
+  
+  # Map factor model strings to pristine, publication-quality presentation text
+  mutate(factor_model = case_when(
+    factor_model == "cf"        ~ "Cash Flow Implied Return",
+    factor_model == "raw_ret"   ~ "Raw Market Return (Daily CRSP)",
+    factor_model == "sum_news"  ~ "cf+dr",
+    TRUE                        ~ factor_model
+  )) %>%
+  setDT()
+
+# ============================================================================
+# PLOTTING FUNCTION WITH MULTI-LINE COMPARISONS & SHADED RIBBONS
+# ============================================================================
+plot_reversals_faceted <- function(data, title_text) {
+  ggplot(data, aes(x = hor_years, y = coef, color = factor_model, fill = factor_model, group = factor_model)) +
+    # Reference baselines
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+    geom_vline(xintercept = 0, linetype = "dotted", color = "red", alpha = 0.8) +
+    
+    # 95% Confidence Interval Overlap Band (1.96 * SE)
+    geom_ribbon(aes(ymin = coef - 1.96 * se, ymax = coef + 1.96 * se), 
+                color = NA, alpha = 0.12) +
+    
+    # Main Estimate Paths
+    geom_line(lwd = 1.1) +
+    
+    # Facetting grid across sensitivity fill parameter limits
+    facet_wrap(~fill_label, scales = "free_y") +
+    
+    # Axis formatting
+    scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+    scale_x_continuous(breaks = seq(-5, 10, by = 1)) + # Step ticks by 1 year for enhanced precision
+    
+    # Color palette selection for premium clarity
+    scale_color_manual(values = c("Cash Flow Implied Return" = "#1f77b4", 
+                                  "Raw Market Return (Daily CRSP)" = "#ff7f0e")) +
+    scale_fill_manual(values = c("Cash Flow Implied Return" = "#1f77b4", 
+                                 "Raw Market Return (Daily CRSP)" = "#ff7f0e")) +
+    
+    labs(title = title_text,
+         subtitle = "95% Newey-West Confidence Intervals (Overlapping Multi-Horizon Paths)",
+         x = "Years from Portfolio Formation (T=0)",
+         y = "Cumulative Horizon Log Return",
+         color = "Model Specification",
+         fill = "Model Specification") +
+    theme_classic() +
+    theme(legend.position = "bottom",
+          legend.box = "horizontal",
+          strip.background = element_blank(),
+          strip.text = element_text(face = "bold", size = 11),
+          plot.title = element_text(face = "bold", size = 13),
+          plot.subtitle = element_text(color = "gray30", size = 10))
+}
+
+# ============================================================================
+# GENERATE COMPARISON FIGURES
+# ============================================================================
+
+# 1. Symmetric Component: Combined Signal (CF vs Raw Return Comparison across All Fills)
+p1 <- plot_reversals_faceted(
+  df_plot_all[var_type == "sym" & var == "combined"], 
+  "Symmetric Component: CF vs Raw Return"
+)
+print(p1)
+cat("\\newline")
+# 2. Total Component: Combined Signal (Optional add-on verification)
+p2 <- plot_reversals_faceted(
+  df_plot_all[var_type == "asy" & var == "combined"], 
+  "Asymmetric Component: CF vs Raw Return"
+)
+print(p2)
+```
+
+
+\newpage
+
+\section{Large}
+```{r fig22b, echo = FALSE, fig.topcaption=TRUE, results = 'asis', fig.height = 4,warning=FALSE, message=FALSE}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+
+stock_base <- "large"
+from_dir <- paste0("tmp/portfolio_results/", stock_base, "/statistics/cf_dr/")
+
+# 1. Load all sensitivity files (h1, h2, h4, h8, h20, h40)
+fill_horizons <- c(1, 2, 4, 8, 20, 40)
+df_list <- lapply(fill_horizons, function(h) {
+  file_path <- paste0(from_dir, "scale_h", h, ".RDS")
+  if (file.exists(file_path)) {
+    dt <- readRDS(file_path)
+    return(dt)
+  }
+  return(NULL)
+})
+
+df_plot_all <- rbindlist(df_list, fill = TRUE) %>%
+  dplyr::filter(var == "combined")
+
+# ============================================================================
+# DATA PREPARATION & HORIZON ALIGNMENT
+# ============================================================================
+df_plot_all <- df_plot_all %>%
+  # Since all horizons (past, future, and anchor) are expressed in calendar months,
+  # dividing by 12 correctly standardizes the entire x-axis timeline to years.
+  mutate(hor_years = hor / 12) %>%
+  
+  # Create clean labels for your facet grid
+  mutate(fill_label = paste0("Fill: ", fill_h, " Quarters")) %>%
+  
+  # Invert past returns to match standard cumulative horizon reporting
+  mutate(coef = case_when(
+    hor < 0  ~ -coef,
+    TRUE   ~ coef
+  )) %>%
+  
+  # Map factor model strings to pristine, publication-quality presentation text
+  mutate(factor_model = case_when(
+    factor_model == "cf"        ~ "Cash Flow Implied Return",
+    factor_model == "raw_ret"   ~ "Raw Market Return (Daily CRSP)",
+    factor_model == "sum_news"  ~ "cf+dr",
+    TRUE                        ~ factor_model
+  )) %>%
+  setDT()
+
+# ============================================================================
+# PLOTTING FUNCTION WITH MULTI-LINE COMPARISONS & SHADED RIBBONS
+# ============================================================================
+plot_reversals_faceted <- function(data, title_text) {
+  ggplot(data, aes(x = hor_years, y = coef, color = factor_model, fill = factor_model, group = factor_model)) +
+    # Reference baselines
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+    geom_vline(xintercept = 0, linetype = "dotted", color = "red", alpha = 0.8) +
+    
+    # 95% Confidence Interval Overlap Band (1.96 * SE)
+    geom_ribbon(aes(ymin = coef - 1.96 * se, ymax = coef + 1.96 * se), 
+                color = NA, alpha = 0.12) +
+    
+    # Main Estimate Paths
+    geom_line(lwd = 1.1) +
+    
+    # Facetting grid across sensitivity fill parameter limits
+    facet_wrap(~fill_label, scales = "free_y") +
+    
+    # Axis formatting
+    scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+    scale_x_continuous(breaks = seq(-5, 10, by = 1)) + # Step ticks by 1 year for enhanced precision
+    
+    # Color palette selection for premium clarity
+    scale_color_manual(values = c("Cash Flow Implied Return" = "#1f77b4", 
+                                  "Raw Market Return (Daily CRSP)" = "#ff7f0e")) +
+    scale_fill_manual(values = c("Cash Flow Implied Return" = "#1f77b4", 
+                                 "Raw Market Return (Daily CRSP)" = "#ff7f0e")) +
+    
+    labs(title = title_text,
+         subtitle = "95% Newey-West Confidence Intervals (Overlapping Multi-Horizon Paths)",
+         x = "Years from Portfolio Formation (T=0)",
+         y = "Cumulative Horizon Log Return",
+         color = "Model Specification",
+         fill = "Model Specification") +
+    theme_classic() +
+    theme(legend.position = "bottom",
+          legend.box = "horizontal",
+          strip.background = element_blank(),
+          strip.text = element_text(face = "bold", size = 11),
+          plot.title = element_text(face = "bold", size = 13),
+          plot.subtitle = element_text(color = "gray30", size = 10))
+}
+
+# ============================================================================
+# GENERATE COMPARISON FIGURES
+# ============================================================================
+
+# 1. Symmetric Component: Combined Signal (CF vs Raw Return Comparison across All Fills)
+p1 <- plot_reversals_faceted(
+  df_plot_all[var_type == "sym" & var == "combined"], 
+  "Symmetric Component: CF vs Raw Return"
+)
+print(p1)
+cat("\\newline")
+# 2. Total Component: Combined Signal (Optional add-on verification)
+p2 <- plot_reversals_faceted(
+  df_plot_all[var_type == "asy" & var == "combined"], 
+  "Asymmetric Component: CF vs Raw Return"
+)
+print(p2)
+```
+
+

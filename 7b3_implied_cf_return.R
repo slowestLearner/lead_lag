@@ -1,18 +1,11 @@
 # ---- compute implied CF-justified return from end-of-t to end-of-t+h
 library(this.path)
 setwd(this.path::this.dir())
-os_type <- Sys.info()["sysname"]
-
-# Set the file path based on the operating system
-if (os_type == "Windows") {
-  # For Windows
-  source("../runmefirst.R")
-} else {
-  # For macOS and Linux
-  source("~/.runmefirst")
-}
+source("../runmefirst.R")
+options(width = 120)
 
 # recall that valuations are always stated as a fraction of price at that time
+# take out extreme valuations that implies over > 2000% or <-95% return
 data <- readRDS("tmp/valuation/using_previous_icc_more_lags.RDS")[valuation > .05 & valuation < 20] %>% na.omit()
 
 # require valuation to be successful. that is, when lag = 0, we can get "valuation" ~ 1
@@ -76,15 +69,12 @@ for (i in hh) {
   }
 }
 
-data <- copy(out)
+data <- copy(out)[, c("v0", "idx") := NULL]
 rm(out, i)
 gc()
-data[, c("v0", "idx") := NULL]
 
 # put into easier to use format
-data <- data.table(melt(data, id.vars = c("statpers", "permno"), variable.name = "hor", value.name = "logrethat"))
-data[, hor := as.integer(gsub("logrethat", "", as.character(hor)))]
-data <- data %>% na.omit()
+data <- data.table(melt(data, id.vars = c("statpers", "permno"), variable.name = "hor", value.name = "logrethat"))[, hor := as.integer(gsub("logrethat", "", as.character(hor)))] %>% na.omit()
 
 # save
 to_dir <- "tmp/valuation/"

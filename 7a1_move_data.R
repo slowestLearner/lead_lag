@@ -1,3 +1,4 @@
+# --- move data from our own computers to this folder
 library(this.path)
 setwd(this.path::this.dir())
 source("../runmefirst.R")

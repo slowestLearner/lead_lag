@@ -4,14 +4,12 @@ My main feeling is we need to bring back decile results
 	Modifying 2b1
 
 Buy and hold return - will results be different? 
-
 Results that show insensitivity to delisting return --- I guess we just put that aside for now
 
 
-## Questions
+## Writing
 
-
-
+Done with first two sections
 
 1. Introduction `{sec:intro}`
   - Related literature `{sec:intro:related}`
@@ -108,23 +106,45 @@ Results that show insensitivity to delisting return --- I guess we just put that
 - `6a_liquidity_half_half.R`: Main fast implementation for constructing liquidity-conditioned signal decomposition outputs from matrix data.
 	- DID NOT rerun. I ran out of memory. 
 	- The code really should be broken up into scripts? TODO
-- `7_debug_cf_dr.R`: Sandbox script with replication/debug checks for ICC summary stats and CF/DR decomposition diagnostics.
-- `7_diagnostic_cf_dr.R`: Produces diagnostic validation tables/plots for ICC and CF-vs-DR news decomposition behavior across horizons.
-- `7a1_solve_ICC.R`: Solves implied cost of capital (ICC) from analyst data and saves paired current/next-period ICC inputs.
-- `7a1_solve_ICC_t_t+h.R`: Solves ICC in a base-month framework suitable for dynamic `t` to `t+h` horizon pairing.
-- `7a2_cf_dr_decomposition.R`: Performs CF/DR price-change decomposition using paired `t` and `t+1` ICC/cash-flow inputs and cross-term pricing.
-- `7a2_cf_dr_decomposition_t_t+h.R`: Extends CF/DR decomposition to all horizons (`t` to `t+h`) and saves per-horizon decomposition files.
-- `7b1_reversals_include_sym_asy_cf_dr.R`: Builds signal-sorted return panels where future outcomes are CF, DR, and total news components.
-- `7b1_reversals_include_sym_asy_cf_dr_new.R`: Currently empty placeholder file for a revised CF/DR reversal implementation.
-- `7b1_reversals_include_sym_asy_cf_dr_t_t+h.R`: Updated CF/DR reversal builder using precomputed multi-horizon (`1` to `180`) news decomposition inputs.
-- `7c1_reversals_tstats_nw_include_sym_asy_cd_dr.R`: Computes Newey-West statistics for CF/DR-based long-short return decompositions across horizon windows.
-- `7c1_reversals_tstats_nw_include_sym_asy_cd_dr_t_t+h.R`: Revised/Newey-West CF/DR summarizer aligned with cumulative `t` to `t+h` construction logic.
-- `7d1_reversals_plot_sym_asy_cd_dr.R`: Creates plotting data and figures for symmetric/asymmetric CF/DR cumulative return trajectories.
-- `7e1_Using_JC_Code.R`: Explores whether signal-sorted portfolios forecast cumulative LTG forecast changes using coauthor data conventions.
-- `8_Detail_LTG.R`: Builds monthly detailed LTG change series from consensus data and compares signal-linked LTG dynamics.
-- `8_Detail_LTG_Raw_Data.R`: Processes raw detailed LTG analyst/broker data into monthly forward-filled and winsorized LTG change panels.
-- `8e1_Using_JC_Code_Input_Individual_LTG.R`: Re-runs LTG mechanism tests using individual-level detailed LTG change inputs.
-- `8f_Compare_Detail_JD_JC.R`: Compares old vs detailed LTG change constructions and visualizes their cross-sectional correlation over time.
+
+
+### CF/DR (cash-flow vs discount-rate) reversal block (`7*`)
+
+- `7a1_move_data.R`: Copies/stages raw inputs (GDP growth, monthly CRSP prices, FF12 industry def, Compustat annual, IBES eps/ltg/price) into `tmp/raw_data/`.
+  done
+- `7a2_get_ind_assignment.R`: Maps stocks to FF12 industries by SIC code and builds quarterly industry-assignment-and-market-cap panel.
+  done
+- `7a3_get_plowback_rate_by_industry.R`: Computes industry-level net-payout-to-earnings (payout) ratios from Compustat for use as the valuation payout assumption.
+  done
+- `7a4_get_industry_ltg.R`: Builds industry-level (EW and VW) average analyst long-term growth (LTG) used as the terminal growth anchor.
+  done
+- `7b1_chen_et_al_contemp.R`: Solves for each stock-quarter's implied cost of capital (q/ICC) via a Chen-et-al-style discounted-earnings model and saves contemporaneous valuation components.
+  done
+- `7b2_chen_et_al_lead_lag.R`: For each period, recomputes valuation using ICC from previous periods (lags 0-40q), isolating the cash-flow channel.
+  done
+- `7b3_implied_cf_return.R`: Converts lagged-ICC valuations into implied cash-flow-justified log returns from end-of-t to end-of-t+h.
+  done
+- `7b4_fill_cf_return_forward.R`: Forward-fills implied CF returns across horizons up to several staleness caps (1,2,4,8,20,40q) via repeated self-merges.
+  done  
+- `7b5_fill_raw_return_forward_jd_archive.R`: Builds true cumulative *raw* CRSP daily returns over the matching quarterly horizons as the realized-return benchmark.
+  TO DELETE
+- `7b5_fill_raw_return_forward.R` - implements the same but faster
+  done
+- `7c1_reversals_include_sym_asy_cf_dr_using_jl_crsp.R`: Forms sym/asy/total/combined signal portfolios and computes CF-return reversal paths over pre/post horizons.
+  done
+- `7c2_reversals_tstats_nw_include_sym_asy_cd_dr_t_t+h.R`: Computes Newey-West means/t-stats of cumulative CF/raw portfolio returns by horizon, with early/late combined subsamples.
+  done
+- `7c3_reversals_plot_sym_asy_cd_dr.R`: Plots the sym/asy CF-vs-DR reversal paths with NW confidence bands across fill-forward horizons.
+  done. TODO - this should go to a plot folder later
+
+
+### Misc numbers and autocorrelation (`9*`)
+
+- `9a_various_numbers.R`: Computes one-off figures cited in text (e.g. fraction of stocks lacking delisting returns).
+- `9b1_signal_autocorrelation.R`: Estimates one-month autocorrelation of CSM signals (per signal + combined) under several fixed-effects specifications.
+- `9b2_autocorrelation_of_other_signals.R`: Runs the same autocorrelation regressions on the Chen characteristics set for comparison/benchmarking.
+
+
 - `runmefirst.R`: Shared environment bootstrap script that loads packages, options, and common settings used by most scripts.
 
 

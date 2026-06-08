@@ -1,17 +1,18 @@
 # --- Get industry-level average LTG
 library(this.path)
 setwd(this.path::this.dir())
-os_type <- Sys.info()["sysname"]
+source("../runmefirst.R")
 
-# Set the file path based on the operating system
-if (os_type == "Windows") {
-  # For Windows
-  source("../runmefirst.R")
-} else {
-  # For macOS and Linux
-  source("~/.runmefirst")
-}
+# os_type <- Sys.info()["sysname"]
 
+# # Set the file path based on the operating system
+# if (os_type == "Windows") {
+#   # For Windows
+#   source("../runmefirst.R")
+# } else {
+#   # For macOS and Linux
+#   source("~/.runmefirst")
+# }
 
 # LTG data
 data <- readRDS("../../data/ibes/quarterly_eps_ltg_price.RDS")[fpi == 0]

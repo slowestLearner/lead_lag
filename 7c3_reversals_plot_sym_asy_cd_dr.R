@@ -1,17 +1,10 @@
+# ---- TODO: this script should go to a "plot" folder
 library(this.path)
 setwd(this.path::this.dir())
+source("../runmefirst.R")
+options(width = 120)
 
-# Set the file path based on the operating system
-os_type <- Sys.info()["sysname"]
-if (os_type == "Windows") {
-  # For Windows
-  source("../runmefirst.R")
-} else {
-  # For macOS and Linux
-  source("~/.runmefirst")
-}
-
-stock_base <- "large"
+stock_base <- "all"
 from_dir <- paste0("tmp/portfolio_results/", stock_base, "/statistics/cf_dr/")
 
 # 1. Load all sensitivity files (h1, h2, h4, h8, h20, h40)
@@ -117,19 +110,3 @@ print(p2)
 #   geom_hline(yintercept = 0, linetype = "dashed", color = "gray50", lwd = 2) +
 #   geom_vline(xintercept = 0, linetype = "dotted", color = "red", alpha = 0.8, lwd = 2) +
 #   theme(text = element_text(size = 30))
-
-# # how much did return go up in the return-based specification?
-# tt <- readRDS("tmp/portfolio_results/large/statistics/newey_west/scale_by_total.RDS")
-# tt <- tt[var == "combined" & from_hor == 1 & to_hor <= 120]
-# ggplot(tt, aes(x = to_hor/12, y = coef, fill = var_type)) +
-#   geom_line(aes(color = var_type)) +
-#   geom_ribbon(aes(ymin = coef - 1.96 * se, ymax = coef + 1.96 * se), alpha = 0.15) +
-#   theme_classic() +
-#   scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
-#   scale_x_continuous(breaks = seq(-5, 10, by = 2)) +
-#   labs(
-#     title = "Combined Signal (Sensitivity to Fill Forward)",
-#     subtitle = "95% Newey-West Confidence Intervals",
-#     x = "Years from portfolio formation (T=0)",
-#     y = "Cumulative return",
-#   ) + theme(text = element_text(size = 30))

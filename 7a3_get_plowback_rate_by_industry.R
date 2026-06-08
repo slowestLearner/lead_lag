@@ -1,21 +1,22 @@
 # --- plowback rate from Compustat: by industry.
 library(this.path)
 setwd(this.path::this.dir())
-os_type <- Sys.info()["sysname"]
+source("../runmefirst.R")
 
-# Set the file path based on the operating system
-if (os_type == "Windows") {
-  # For Windows
-  source("../runmefirst.R")
-} else {
-  # For macOS and Linux
-  source("~/.runmefirst")
-}
+# os_type <- Sys.info()["sysname"]
+
+# # Set the file path based on the operating system
+# if (os_type == "Windows") {
+#   # For Windows
+
+# } else {
+#   # For macOS and Linux
+#   source("~/.runmefirst")
+# }
 
 
 # get CRSP-compsutat merge, annual data
-data <- readRDS("tmp/raw_data/compustat_annual.RDS")
-data <- data[, list(fyear, gvkey,
+data <- readRDS("tmp/raw_data/compustat_annual.RDS")[, list(fyear, gvkey,
   permno, sich, at, ib, dvc, sstk, prstkc,
   prcc = ifelse(!is.na(prcc_f), prcc_f, prcc_c), csho
 )]
@@ -40,7 +41,6 @@ for (i in 1:nrow(tmp)) {
 data[is.na(ind), ind := "other"]
 rm(i, tmp)
 
-
 # turn earnings, dividends, and net buybacks as a fraction of total assets (at), and winsorize
 vv <- c("ib", "dvc", "net_purchase")
 for (this in vv) {
@@ -61,7 +61,6 @@ out[, net_payout := dvc + net_purchase]
 # get payout ratio and output
 tt <- out[, list(payout_ratio = sum(net_payout) / sum(ib)), ind]
 tt <- tt[order(payout_ratio)]
-
 
 # save payout by industry
 to_dir <- "tmp/inputs/"
